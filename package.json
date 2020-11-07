@@ -1,0 +1,30 @@
+{
+  "name": "server2",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "start:prod": "node ./bin/www",
+    "start:dev": "nodemon ./bin/www",
+    "lint": "eslint --fix"
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "cookie-parser": "~1.4.4",
+    "debug": "~2.6.9",
+    "dotenv": "^8.2.0",
+    "express": "~4.16.1",
+    "http-errors": "~1.6.3",
+    "is-empty": "^1.2.0",
+    "jsonwebtoken": "^8.5.1",
+    "mongoose": "^5.10.13",
+    "morgan": "~1.9.1",
+    "passport": "^0.4.1",
+    "passport-jwt": "^4.0.0",
+    "pug": "^2.0.4",
+    "validator": "^13.1.17"
+  },
+  "devDependencies": {
+    "eslint": "^7.13.0",
+    "nodemon": "^2.0.6"
+  }
+}
