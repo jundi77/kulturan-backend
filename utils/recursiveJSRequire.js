@@ -1,6 +1,9 @@
 /**
  * Secara rekursif, require semua file .js
- * yang ada di direktori.
+ * yang ada di direktori dan
+ * subdirektorinya.
+ *
+ * modified from https://stackoverflow.com/questions/5364928/node-js-require-all-files-in-a-folder
  */
 module.exports = (...dirs) => {
     const glob = require('glob');

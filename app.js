@@ -1,42 +1,56 @@
-/* eslint-disable no-undef */
-var createError = require("http-errors");
-var express = require("express");
-var path = require("path");
-var cookieParser = require("cookie-parser");
-var logger = require("morgan");
+/**
+ * Supaya .env dapat diakses melalui
+ * process.env
+ */
+require('dotenv').config();
 
-var indexRouter = require("./routes/index");
-var usersRouter = require("./routes/users");
-var app = express();
+const express = require('express');
+const mongoose = require('mongoose');
+const passport = require('passport');
+const utils = require('./utils');
+const auth = require('./middlewares/auth');
+const app = express();
 
-// view engine setup
-app.set("views", path.join(__dirname, "views"));
-app.set("view engine", "pug");
+/**
+ * Import yang diperlukan ke global
+ */
+global.kulturan = {};
+global.kulturan.utils = utils;
 
-app.use(logger("dev"));
+/**
+ * app.use apaan?
+ * buat nambah middleware.
+ *
+ * Kok nggak ada pathnya?
+ * Kalau nggak ada pathnya, berarti buat general.
+ *
+ * https://stackoverflow.com/questions/11321635/nodejs-express-what-is-app-use#11321828
+ */
+// parse body ke json
 app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
-app.use(cookieParser());
-app.use(express.static(path.join(__dirname, "public")));
 
-app.use("/", indexRouter);
-app.use("/users", usersRouter);
+// intialize passport
+app.use(passport.initialize());
 
-// catch 404 and forward to error handler
-app.use(function (req, res, next) {
-    next(createError(404));
-});
+// connect ke mongoooooooooodb
+mongoose
+    .connect(process.env.MONGO_URI, {
+        // config disuruh sama mongodb
+        useNewUrlParser: true,
+        useUnifiedTopology: true,
+    })
+    .then(() => {
+        console.log('DB Connected');
 
-// error handler
-// eslint-disable-next-line no-unused-vars
-app.use((err, req, res, next) => {
-    // set locals, only providing error in development
-    res.locals.message = err.message;
-    res.locals.error = req.app.get("env") === "development" ? err : {};
+        // kalau udah connect, initialize passport
+        // require('./config/passport')(passport); error
+        // passportBearerConfig(passport);
+    })
+    .catch((err) => {
+        console.error(err);
+        throw err;
+    });
 
-    // render the error page
-    res.status(err.status || 500);
-    res.render("error");
-});
-
+app.use('/test/', require('./routes/web'));
+app.use('/test-token', auth);
 module.exports = app;

@@ -4,10 +4,10 @@
   "private": true,
   "scripts": {
     "start:prod": "node ./bin/www",
-    "start:dev": "nodemon ./bin/www",
-    "lint": "eslint --fix"
+    "start:dev": "nodemon ./bin/www"
   },
   "dependencies": {
+    "@unicode/unicode-13.0.0": "^1.0.2",
     "bcryptjs": "^2.4.3",
     "cookie-parser": "~1.4.4",
     "debug": "~2.6.9",
@@ -20,11 +20,14 @@
     "morgan": "~1.9.1",
     "passport": "^0.4.1",
     "passport-jwt": "^4.0.0",
+    "prettier": "^2.1.2",
     "pug": "^2.0.4",
     "validator": "^13.1.17"
   },
   "devDependencies": {
     "eslint": "^7.13.0",
+    "eslint-config-prettier": "^6.15.0",
+    "eslint-plugin-prettier": "^3.1.4",
     "nodemon": "^2.0.6"
   }
 }
