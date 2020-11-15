@@ -35,6 +35,7 @@ function validateRegisterInput(data) {
     }
 
     if (!Validator.isLength(data.password, { min: 6, max: 16 })) {
+        //bug
         errors.password = "Password's length must between 6 and 16";
     }
 
@@ -53,4 +54,4 @@ function validateRegisterInput(data) {
     };
 }
 
-module.exports = { validateRegisterInput };
+module.exports = validateRegisterInput;

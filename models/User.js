@@ -4,15 +4,13 @@ const Schema = mongoose.Schema;
 const UserSchema = new Schema(
     {
         name: {
-            /**
-             * Tidak perlu required, kemungkinan besar yang perlu
-             * name hanya publisher, bukan viewer.
-             */
             type: String,
+            required: true,
         },
         email: {
             type: String,
             required: true,
+            unique: true,
         },
         password: {
             type: String,

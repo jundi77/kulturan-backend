@@ -2,10 +2,11 @@ const bcrypt = require('bcryptjs');
 const JWT = require('jsonwebtoken');
 const LoginFormValidation = require('../form/validation/LoginFormValidation');
 const User = require('../../models/User');
+const validateLoginInput = require('../form/validation/LoginFormValidation');
 
 const LoginController = (req, res) => {
     // validasi dulu bener nggak isi requestnya
-    const { errors, isValid } = LoginFormValidation(req.body);
+    const { errors, isValid } = validateLoginInput(req.body);
     if (!isValid) {
         res.status(400).json(errors);
     }
@@ -15,6 +16,7 @@ const LoginController = (req, res) => {
             if (!user) {
                 errors.email = 'Email is wrong';
                 res.status(400).json(errors);
+                return;
             }
 
             // Compare password yang di request dengan yang disimpan
@@ -22,6 +24,7 @@ const LoginController = (req, res) => {
                 if (!isMatch) {
                     errors.password = 'Wrong password';
                     res.status(400).json(errors);
+                    return;
                 }
 
                 /**

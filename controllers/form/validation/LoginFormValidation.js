@@ -32,4 +32,4 @@ function validateLoginInput(data) {
     };
 }
 
-module.exports = { validateLoginInput };
+module.exports = validateLoginInput;

@@ -8,7 +8,8 @@ const express = require('express');
 const mongoose = require('mongoose');
 const passport = require('passport');
 const utils = require('./utils');
-const auth = require('./middlewares/auth');
+const testToken = require('./controllers/auth/TestTokenController');
+const passportBearerConfig = require('./config/passport');
 const app = express();
 
 /**
@@ -38,19 +39,22 @@ mongoose
         // config disuruh sama mongodb
         useNewUrlParser: true,
         useUnifiedTopology: true,
+        useCreateIndex: true,
     })
     .then(() => {
         console.log('DB Connected');
 
         // kalau udah connect, initialize passport
-        // require('./config/passport')(passport); error
-        // passportBearerConfig(passport);
+        passportBearerConfig(passport);
     })
     .catch((err) => {
         console.error(err);
         throw err;
     });
 
-app.use('/test/', require('./routes/web'));
-app.use('/test-token', auth);
+app.use('/', require('./routes/web'));
+app.use('/test-middleware', passport.authenticate('jwt'), (req, res) => {
+    res.status(200).json({ status: 'success' });
+    return;
+});
 module.exports = app;

@@ -1,12 +1,13 @@
 const bcrypt = require('bcryptjs');
-const RegisterFormValidation = require('../form/validation/RegisterFormValidation');
+const validateRegisterInput = require('../form/validation/RegisterFormValidation');
 const User = require('../../models/User');
 require('../form/validation/RegisterFormValidation');
 
 const RegisterController = (req, res) => {
-    const { errors, isValid } = RegisterFormValidation(req.body);
+    const { errors, isValid } = validateRegisterInput(req.body);
     if (!isValid) {
         res.status(400).json(errors);
+        return;
     }
 
     User.findOne({ email: req.body.email })
@@ -15,6 +16,7 @@ const RegisterController = (req, res) => {
             if (user) {
                 errors.email = 'User already exists';
                 res.status(400).json(errors);
+                return;
             }
 
             const newUser = new User({
@@ -31,7 +33,9 @@ const RegisterController = (req, res) => {
                     newUser.password = hash;
                     newUser
                         .save()
-                        .then((user) => res.status(200).json(user))
+                        .then((user) =>
+                            res.status(200).json({ status: 'success' })
+                        )
                         .catch((err) => {
                             // console.error(err);
                         });
