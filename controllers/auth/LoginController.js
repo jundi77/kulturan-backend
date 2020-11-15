@@ -50,7 +50,7 @@ const LoginController = (req, res) => {
                             throw err;
                         }
                         res.status(200).json({
-                            success: true,
+                            status: 'success',
                             token,
                         });
                     }
