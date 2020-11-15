@@ -6,8 +6,15 @@ let router;
 
 // api url
 router = express.Router();
+router.get('/', (req, res) => {
+    res.status(200).json({
+        status: 'success',
+        data: {
+            endpoint: ['/test/register', '/test/login', '/verif-token'],
+        },
+    });
+});
 router.post('/test/register', RegisterController);
 router.post('/test/login', LoginController);
 router.post('/verif-token', TestTokenController);
-
 module.exports = router;
