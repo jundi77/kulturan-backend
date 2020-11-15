@@ -10,7 +10,9 @@ router.get('/', (req, res) => {
     res.status(200).json({
         status: 'success',
         data: {
-            endpoint: ['/test/register', '/test/login', '/verif-token'],
+            endpoint: {
+                post: ['/test/register', '/test/login', '/verif-token'],
+            },
         },
     });
 });
