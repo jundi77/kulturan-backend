@@ -7,6 +7,7 @@ require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
 const passport = require('passport');
+const cors = require('cors');
 const utils = require('./utils');
 const testToken = require('./controllers/auth/TestTokenController');
 const passportBearerConfig = require('./config/passport');
@@ -33,6 +34,7 @@ app.use(express.json());
 // intialize passport
 app.use(passport.initialize());
 
+app.use(cors());
 // connect ke mongoooooooooodb
 mongoose
     .connect(process.env.MONGO_URI, {

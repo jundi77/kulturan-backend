@@ -8,15 +8,15 @@ const LoginController = (req, res) => {
     // validasi dulu bener nggak isi requestnya
     const { errors, isValid } = validateLoginInput(req.body);
     if (!isValid) {
-        res.status(400).json(errors);
+        return res.status(400).json(errors);
     }
 
     User.findOne({ email: req.body.email })
         .then((user) => {
             if (!user) {
                 errors.email = 'Email is wrong';
-                res.status(400).json(errors);
-                return;
+                return res.status(400).json(errors);
+                // return res.send(errors);
             }
 
             // Compare password yang di request dengan yang disimpan
