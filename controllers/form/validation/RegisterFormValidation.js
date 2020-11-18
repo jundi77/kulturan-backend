@@ -9,7 +9,7 @@ function validateRegisterInput(data) {
         name: isEmpty(data.name) ? '' : data.name,
         email: isEmpty(data.email) ? '' : data.email,
         password: isEmpty(data.password) ? '' : data.password,
-        password_confirm: isEmpty(data.password_confirm)
+        password_confirm: isEmpty(data.password_confirm) // TODO: tidak perlu
             ? ''
             : data.password_confirm,
     };
