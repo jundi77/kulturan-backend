@@ -1,6 +1,5 @@
 const bcrypt = require('bcryptjs');
 const JWT = require('jsonwebtoken');
-const LoginFormValidation = require('../form/validation/LoginFormValidation');
 const User = require('../../models/User');
 const validateLoginInput = require('../form/validation/LoginFormValidation');
 
@@ -8,13 +7,16 @@ const LoginController = (req, res) => {
     // validasi dulu bener nggak isi requestnya
     const { errors, isValid } = validateLoginInput(req.body);
     if (!isValid) {
+        errors.status = 'failed';
         return res.status(400).json(errors);
     }
 
     User.findOne({ email: req.body.email })
         .then((user) => {
             if (!user) {
-                errors.email = 'Email is wrong';
+                errors.status = 'failed';
+                errors.email = 'Email atau password salah';
+                errors.password = errors.email;
                 return res.status(400).json(errors);
                 // return res.send(errors);
             }
@@ -22,7 +24,9 @@ const LoginController = (req, res) => {
             // Compare password yang di request dengan yang disimpan
             bcrypt.compare(req.body.password, user.password).then((isMatch) => {
                 if (!isMatch) {
-                    errors.password = 'Wrong password';
+                    errors.status = 'failed';
+                    errors.email = 'Email atau password salah';
+                    errors.password = errors.email;
                     res.status(400).json(errors);
                     return;
                 }
@@ -51,7 +55,9 @@ const LoginController = (req, res) => {
                         }
                         res.status(200).json({
                             status: 'success',
-                            token,
+                            data: {
+                                token,
+                            },
                         });
                     }
                 );

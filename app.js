@@ -9,8 +9,6 @@ const mongoose = require('mongoose');
 const passport = require('passport');
 const cors = require('cors');
 const utils = require('./utils');
-const testToken = require('./controllers/auth/TestTokenController');
-const passportBearerConfig = require('./config/passport');
 const app = express();
 
 /**
@@ -31,10 +29,9 @@ global.kulturan.utils = utils;
 // parse body ke json
 app.use(express.json());
 
-// intialize passport
-app.use(passport.initialize());
-
+// cors global
 app.use(cors());
+
 // connect ke mongoooooooooodb
 mongoose
     .connect(process.env.MONGO_URI, {
@@ -45,18 +42,16 @@ mongoose
     })
     .then(() => {
         console.log('DB Connected');
-
-        // kalau udah connect, initialize passport
-        passportBearerConfig(passport);
     })
     .catch((err) => {
         console.error(err);
         throw err;
     });
 
-app.use('/', require('./routes/web'));
-app.use('/test-middleware', passport.authenticate('jwt'), (req, res) => {
-    res.status(200).json({ status: 'success' });
-    return;
-});
+let apiRoute = require('./routes/api');
+apiRoute.authRoute(app);
+apiRoute.userRoute(app);
+apiRoute.videoRoute(app);
+apiRoute.paymentGatewayRoute(app);
+
 module.exports = app;

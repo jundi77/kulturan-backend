@@ -1,11 +1,13 @@
 const bcrypt = require('bcryptjs');
 const validateRegisterInput = require('../form/validation/RegisterFormValidation');
 const User = require('../../models/User');
+const LoginController = require('./LoginController');
 require('../form/validation/RegisterFormValidation');
 
 const RegisterController = (req, res) => {
     const { errors, isValid } = validateRegisterInput(req.body);
     if (!isValid) {
+        errors.status = 'failed';
         res.status(400).json(errors);
         return;
     }
@@ -14,7 +16,8 @@ const RegisterController = (req, res) => {
         .then((user) => {
             console.log(user);
             if (user) {
-                errors.email = 'User already exists';
+                errors.status = 'failed';
+                errors.email = 'Email telah terdaftar';
                 res.status(400).json(errors);
                 return;
             }
@@ -31,14 +34,9 @@ const RegisterController = (req, res) => {
                         console.error(err);
                     }
                     newUser.password = hash;
-                    newUser
-                        .save()
-                        .then((user) =>
-                            res.status(200).json({ status: 'success' })
-                        )
-                        .catch((err) => {
-                            // console.error(err);
-                        });
+                    newUser.save().then((user) => {
+                        return LoginController(req, res);
+                    });
                 });
             });
         })

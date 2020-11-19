@@ -4,26 +4,16 @@ const Validator = require('validator');
 function validateLoginInput(data) {
     let errors = {};
 
-    // convert kekosongan menjadi '', menghindari kata undefined
-    data = {
-        email: isEmpty(data.email) ? '' : data.email,
-        password: isEmpty(data.password) ? '' : data.password,
-    };
-
     if (isEmpty(data.email)) {
-        errors.email = 'Email is required';
+        errors.email = 'Email tidak boleh kosong';
+    } else if (!Validator.isEmail(data.email)) {
+        errors.email = 'Email tidak valid';
     }
 
     if (isEmpty(data.password)) {
-        errors.password = 'Password is required';
-    }
-
-    if (!Validator.isEmail(data.email)) {
-        errors.email = 'Email is invalid';
-    }
-
-    if (!Validator.isLength(data.password, { min: 6, max: 16 })) {
-        errors.password = "Password's length must between 6 and 16";
+        errors.password = 'Password tidak boleh kosong';
+    } else if (!Validator.isLength(data.password, { min: 6, max: 16 })) {
+        errors.password = 'Panjang password 6-16 karakter';
     }
 
     return {
