@@ -25,14 +25,15 @@ function verifyToken(options) {
                                 token: 'Invalid token',
                             });
                         }
-                        res.locals.userData = {
+                        res.locals.user = {
                             status: 'success',
                             data: { id, name, email },
                         };
                         if (options && options.sendUserData === true) {
-                            return res.status(200).json(res.locals.userData);
+                            return res.status(200).json(res.locals.user);
                         }
-                        return next();
+                        // return res.status(200).json(res.locals.userData);
+                        next('route');
                     }
                 })
                 .catch((err) => console.error(err));

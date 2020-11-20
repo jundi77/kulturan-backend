@@ -20,19 +20,21 @@ router.get('/', (req, res) => {
  * Routing untuk user
  * @param app
  */
-function userRoute(app) {
+const userRoute = (app) => {
+    'use strict';
     let router = express.Router();
 
+    router.use('/', AuthTokenMiddleware());
     router.put('/edit-account', UserDataController.editAccount);
-    router.post('/keranjang', UserDataController.getKeranjang);
+    router.get('/keranjang', UserDataController.getKeranjang);
     router.put('/keranjang', UserDataController.addToKeranjang);
     router.delete('/keranjang', UserDataController.removeFromKeranjang);
-    router.post('/favorit', UserDataController.getFavorit);
+    router.get('/favorit', UserDataController.getFavorit);
     router.put('/favorit', UserDataController.addToFavorit);
     router.delete('/favorit', UserDataController.removeFromFavorit);
 
     app.use('/user', router);
-}
+};
 
 /**
  * Routing untuk video
@@ -43,7 +45,11 @@ function videoRoute(app) {
 
     router.get('/', VideoController.getAll);
     router.get('/:videoid', VideoController.getFromID); // ambil hal dasar
-    router.post('/:videoid', VideoController.getPremiumLink); // harus sudah beli, ini berarti minta link non trailer
+    router.post(
+        '/:videoid',
+        AuthTokenMiddleware(),
+        VideoController.getPremiumLink
+    ); // harus sudah beli, ini berarti minta link non trailer
 
     app.use('/video', router);
 }
@@ -55,8 +61,8 @@ function videoRoute(app) {
 function paymentGatewayRoute(app) {
     let router = express.Router();
 
-    router.post('/buy', PaymentController.buy); // mau beli?
-    router.put('/payment-struct', PaymentController.struct);
+    router.post('/buy', AuthTokenMiddleware(), PaymentController.buy); // mau beli?
+    router.get('/struct', AuthTokenMiddleware(), PaymentController.struct);
     router.post('/midtrans-receiver', PaymentController.midtransReceiver); // ambil notifikasi dari midtrans
 
     app.use('/payment', router);
