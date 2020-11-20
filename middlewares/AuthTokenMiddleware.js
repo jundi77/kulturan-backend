@@ -33,7 +33,7 @@ function verifyToken(options) {
                             return res.status(200).json(res.locals.user);
                         }
                         // return res.status(200).json(res.locals.userData);
-                        next('route');
+                        next();
                     }
                 })
                 .catch((err) => console.error(err));
