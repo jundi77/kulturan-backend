@@ -62,7 +62,7 @@ function paymentGatewayRoute(app) {
     let router = express.Router();
 
     router.post('/buy', AuthTokenMiddleware(), PaymentController.buy); // mau beli?
-    router.get('/struct', AuthTokenMiddleware(), PaymentController.struct);
+    router.get('/struct', AuthTokenMiddleware(), PaymentController.getStruct);
     router.post('/midtrans-receiver', PaymentController.midtransReceiver); // ambil notifikasi dari midtrans
 
     app.use('/payment', router);

@@ -10,12 +10,19 @@ const passport = require('passport');
 const cors = require('cors');
 const utils = require('./utils');
 const app = express();
+const midtransClient = require('midtrans-client');
 
 /**
  * Import yang diperlukan ke global
  */
 global.kulturan = {};
 global.kulturan.utils = utils;
+global.kulturan.midtrans = {};
+global.kulturan.midtrans.snap = new midtransClient.Snap({
+    isProduction: false,
+    serverKey: process.env.MIDTRANS_SERVER_KEY,
+    clientKey: process.env.MIDTRANS_CLIENT_KEY,
+});
 
 /**
  * app.use apaan?
