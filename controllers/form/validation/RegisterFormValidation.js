@@ -6,8 +6,14 @@ function validateRegisterInput(data) {
 
     if (isEmpty(data.name)) {
         errors.name = 'Name tidak boleh kosong';
-    } else if (!Validator.isAlpha(data.name)) {
-        errors.name = 'Name harus huruf';
+    } else {
+        const valid = (input) =>
+            input.split(' ').every(function (str) {
+                return Validator.isAlpha(str);
+            });
+        if (!valid(data.name)) {
+            errors.name = 'Name harus huruf';
+        }
     }
 
     if (isEmpty(data.email)) {
