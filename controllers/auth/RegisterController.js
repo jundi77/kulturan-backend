@@ -7,6 +7,7 @@ require('../form/validation/RegisterFormValidation');
 const RegisterController = (req, res) => {
     const { errors, isValid } = validateRegisterInput(req.body);
     if (!isValid) {
+        errors = { msg: errors };
         errors.status = 'failed';
         res.status(400).json(errors);
         return;
@@ -16,8 +17,9 @@ const RegisterController = (req, res) => {
         .then((user) => {
             console.log(user);
             if (user) {
+                errors = { msg: errors };
                 errors.status = 'failed';
-                errors.email = 'Email telah terdaftar';
+                errors.msg.email = 'Email telah terdaftar';
                 res.status(400).json(errors);
                 return;
             }

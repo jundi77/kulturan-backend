@@ -22,7 +22,9 @@ function verifyToken(options) {
                         if (decoded.email !== user.email) {
                             return res.status(400).json({
                                 status: 'failed',
-                                token: 'Invalid token',
+                                msg: {
+                                    token: 'Invalid token',
+                                },
                             });
                         }
                         res.locals.user = {
@@ -40,7 +42,7 @@ function verifyToken(options) {
         } catch (error) {
             return res
                 .status(400)
-                .json({ status: 'failed', token: 'Invalid token' });
+                .json({ status: 'failed', msg: { token: 'Invalid token' } });
         }
     };
 }

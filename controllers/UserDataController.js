@@ -9,6 +9,7 @@ function editAccount(req, res) {
     try {
         const { errors, isValid, empty } = validateUserData(req.body);
         if (!isValid) {
+            errors = { msg: errors };
             errors.status = 'failed';
             return res.status(400).json(errors);
         }
@@ -30,8 +31,9 @@ function editAccount(req, res) {
                         .compare(req.body.password, user.password)
                         .then((isMatch) => {
                             if (!isMatch) {
+                                errors = { msg: errors };
                                 errors.status = 'failed';
-                                errors.password = 'Password salah';
+                                errors.msg.password = 'Password salah';
                                 return res.status(400).json(errors);
                             }
 
@@ -120,14 +122,18 @@ function addToKeranjang(req, res) {
             if (!objectID.isValid(req.body.videoID)) {
                 return res.status(400).json({
                     status: 'failed',
-                    videoID: 'ID video tidak valid',
+                    msg: {
+                        videoID: 'ID video tidak valid',
+                    },
                 });
             }
             Video.findOne({ _id: req.body.videoID }).then((video) => {
                 if (!video) {
                     return res.status(400).json({
                         status: 'failed',
-                        videoID: 'Video tidak ditemukan',
+                        msg: {
+                            videoID: 'Video tidak ditemukan',
+                        },
                     });
                 }
             });
@@ -167,7 +173,9 @@ function removeFromKeranjang(req, res) {
             if (!objectID.isValid(req.body.videoID)) {
                 return res.status(400).json({
                     status: 'failed',
-                    videoID: 'ID video tidak valid',
+                    msg: {
+                        videoID: 'ID video tidak valid',
+                    },
                 });
             }
             Video.findOne({ _id: req.body.videoID })
@@ -175,7 +183,9 @@ function removeFromKeranjang(req, res) {
                     if (!video) {
                         return res.status(400).json({
                             status: 'failed',
-                            videoID: 'Video tidak ditemukan',
+                            msg: {
+                                videoID: 'Video tidak ditemukan',
+                            },
                         });
                     }
                 })
@@ -234,7 +244,9 @@ function addToFavorit(req, res) {
             if (!objectID.isValid(req.body.videoID)) {
                 return res.status(400).json({
                     status: 'failed',
-                    videoID: 'ID video tidak valid',
+                    msg: {
+                        videoID: 'ID video tidak valid',
+                    },
                 });
             }
             let videoFound;
@@ -243,7 +255,9 @@ function addToFavorit(req, res) {
                     if (!video) {
                         return res.status(400).json({
                             status: 'failed',
-                            videoID: 'Video tidak ditemukan',
+                            msg: {
+                                videoID: 'Video tidak ditemukan',
+                            },
                         });
                     }
                     videoFound = video;
@@ -288,7 +302,9 @@ function removeFromFavorit(req, res) {
             if (!objectID.isValid(req.body.videoID)) {
                 return res.status(400).json({
                     status: 'failed',
-                    videoID: 'ID video tidak valid',
+                    msg: {
+                        videoID: 'ID video tidak valid',
+                    },
                 });
             }
             let videoFound;
@@ -297,7 +313,9 @@ function removeFromFavorit(req, res) {
                     if (!video) {
                         return res.status(400).json({
                             status: 'failed',
-                            videoID: 'Video tidak ditemukan',
+                            msg: {
+                                videoID: 'Video tidak ditemukan',
+                            },
                         });
                     }
                     videoFound = video;

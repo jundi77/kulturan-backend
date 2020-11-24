@@ -16,8 +16,10 @@ function buy(req, res) {
             console.log(transaction);
             return res.status(200).json({
                 status: 'success',
-                transactionToken: transaction.token,
-                redirectURL: transaction.redirect_url,
+                data: {
+                    transactionToken: transaction.token,
+                    redirectURL: transaction.redirect_url,
+                },
             });
         })
         .catch((err) => {

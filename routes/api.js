@@ -61,7 +61,7 @@ function videoRoute(app) {
 function paymentGatewayRoute(app) {
     let router = express.Router();
 
-    router.post('/buy', AuthTokenMiddleware(), PaymentController.buy); // mau beli?
+    router.post('/buy', AuthTokenMiddleware(), PaymentController.buy); // mau beli? Perlu add videoID yang array
     router.get('/struct', AuthTokenMiddleware(), PaymentController.getStruct);
     router.post('/midtrans-receiver', PaymentController.midtransReceiver); // ambil notifikasi dari midtrans
 

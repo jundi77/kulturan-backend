@@ -7,6 +7,7 @@ const LoginController = (req, res) => {
     // validasi dulu bener nggak isi requestnya
     const { errors, isValid } = validateLoginInput(req.body);
     if (!isValid) {
+        errors = { msg: errors };
         errors.status = 'failed';
         return res.status(400).json(errors);
     }
@@ -14,9 +15,10 @@ const LoginController = (req, res) => {
     User.findOne({ email: req.body.email })
         .then((user) => {
             if (!user) {
+                errors = { msg: errors };
                 errors.status = 'failed';
-                errors.email = 'Email atau password salah';
-                errors.password = errors.email;
+                errors.msg.email = 'Email atau password salah';
+                errors.msg.password = errors.msg.email;
                 return res.status(400).json(errors);
                 // return res.send(errors);
             }
@@ -24,10 +26,10 @@ const LoginController = (req, res) => {
             // Compare password yang di request dengan yang disimpan
             bcrypt.compare(req.body.password, user.password).then((isMatch) => {
                 if (!isMatch) {
+                    errors = { msg: errors };
                     errors.status = 'failed';
-                    errors.email = 'Email atau password salah';
-                    errors.password = errors.email;
-                    res.status(400).json(errors);
+                    errors.msg.email = 'Email atau password salah';
+                    errors.msg.password = errors.email;
                     return;
                 }
 
