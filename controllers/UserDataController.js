@@ -7,7 +7,7 @@ const objectID = require('mongoose').Types.ObjectId;
 
 function editAccount(req, res) {
     try {
-        const { errors, isValid, empty } = validateUserData(req.body);
+        let { errors, isValid, empty } = validateUserData(req.body);
         if (!isValid) {
             errors = { msg: errors };
             errors.status = 'failed';

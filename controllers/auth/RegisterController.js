@@ -5,7 +5,7 @@ const LoginController = require('./LoginController');
 require('../form/validation/RegisterFormValidation');
 
 const RegisterController = (req, res) => {
-    const { errors, isValid } = validateRegisterInput(req.body);
+    let { errors, isValid } = validateRegisterInput(req.body);
     if (!isValid) {
         errors = { msg: errors };
         errors.status = 'failed';

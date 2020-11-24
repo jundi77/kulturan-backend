@@ -5,7 +5,7 @@ const validateLoginInput = require('../form/validation/LoginFormValidation');
 
 const LoginController = (req, res) => {
     // validasi dulu bener nggak isi requestnya
-    const { errors, isValid } = validateLoginInput(req.body);
+    let { errors, isValid } = validateLoginInput(req.body);
     if (!isValid) {
         errors = { msg: errors };
         errors.status = 'failed';
