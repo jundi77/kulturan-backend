@@ -15,10 +15,8 @@ const LoginController = (req, res) => {
     User.findOne({ email: req.body.email })
         .then((user) => {
             if (!user) {
-                errors = { msg: errors };
                 errors.status = 'failed';
-                errors.msg.email = 'Email atau password salah';
-                errors.msg.password = errors.msg.email;
+                errors.msg = 'Email atau password salah';
                 return res.status(400).json(errors);
                 // return res.send(errors);
             }
@@ -26,10 +24,8 @@ const LoginController = (req, res) => {
             // Compare password yang di request dengan yang disimpan
             bcrypt.compare(req.body.password, user.password).then((isMatch) => {
                 if (!isMatch) {
-                    errors = { msg: errors };
                     errors.status = 'failed';
-                    errors.msg.email = 'Email atau password salah';
-                    errors.msg.password = errors.email;
+                    errors.msg = 'Email atau password salah';
                     return res.status(400).json(errors);
                 }
 

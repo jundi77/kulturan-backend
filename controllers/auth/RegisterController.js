@@ -17,9 +17,8 @@ const RegisterController = (req, res) => {
         .then((user) => {
             console.log(user);
             if (user) {
-                errors = { msg: errors };
                 errors.status = 'failed';
-                errors.msg.email = 'Email telah terdaftar';
+                errors.msg = 'Email telah terdaftar';
                 res.status(400).json(errors);
                 return;
             }

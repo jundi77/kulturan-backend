@@ -20,6 +20,7 @@ function editAccount(req, res) {
         }
         User.findOne({ _id: res.locals.user.data.id })
             .then((user) => {
+                // nyari user yang emailnya sama
                 user.name = req.body.hasOwnProperty('name')
                     ? req.body.name
                     : user.name;
@@ -31,9 +32,8 @@ function editAccount(req, res) {
                         .compare(req.body.password, user.password)
                         .then((isMatch) => {
                             if (!isMatch) {
-                                errors = { msg: errors };
                                 errors.status = 'failed';
-                                errors.msg.password = 'Password salah';
+                                errors.msg = 'Password salah';
                                 return res.status(400).json(errors);
                             }
 

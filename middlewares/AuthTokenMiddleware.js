@@ -8,9 +8,7 @@ function verifyToken(options) {
         if (!token) {
             res.status(401).json({
                 status: 'failed',
-                msg: {
-                    token: 'Bearer token is required',
-                },
+                msg: 'Bearer token is required',
             });
             return;
         }
@@ -24,9 +22,7 @@ function verifyToken(options) {
                         if (decoded.email !== user.email) {
                             return res.status(400).json({
                                 status: 'failed',
-                                msg: {
-                                    token: 'Invalid token',
-                                },
+                                msg: 'Invalid token',
                             });
                         }
                         res.locals.user = {
@@ -44,7 +40,7 @@ function verifyToken(options) {
         } catch (error) {
             return res
                 .status(400)
-                .json({ status: 'failed', msg: { token: 'Invalid token' } });
+                .json({ status: 'failed', msg: 'Invalid token' });
         }
     };
 }
