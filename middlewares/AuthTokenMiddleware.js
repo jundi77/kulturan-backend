@@ -8,7 +8,9 @@ function verifyToken(options) {
         if (!token) {
             res.status(401).json({
                 status: 'failed',
-                token: 'Bearer token is required',
+                msg: {
+                    token: 'Bearer token is required',
+                },
             });
             return;
         }
