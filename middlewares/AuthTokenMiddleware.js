@@ -32,7 +32,6 @@ function verifyToken(options) {
                         if (options && options.sendUserData === true) {
                             return res.status(200).json(res.locals.user);
                         }
-                        // return res.status(200).json(res.locals.userData);
                         next();
                     }
                 })
