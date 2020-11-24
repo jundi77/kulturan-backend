@@ -30,7 +30,7 @@ const LoginController = (req, res) => {
                     errors.status = 'failed';
                     errors.msg.email = 'Email atau password salah';
                     errors.msg.password = errors.email;
-                    return;
+                    return res.status(400).json(errors);
                 }
 
                 /**
