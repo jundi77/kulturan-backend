@@ -3,11 +3,16 @@ const Schema = mongoose.Schema;
 
 const VideoSchema = new Schema(
     {
-        linkUtama: {
-            type: String,
-        },
-        linkTrailer: {
-            type: String,
+        link: {
+            stage: {
+                type: String,
+            },
+            trailer: {
+                type: String,
+            },
+            thumbnail: {
+                type: String,
+            },
         },
         views: {
             type: Number,
@@ -36,9 +41,11 @@ const VideoSchema = new Schema(
             default: 0,
             min: 0,
         },
-        tanggalPementasan: {
-            type: Date,
-            required: true,
+        tanggal: {
+            pementasan: {
+                type: Date,
+                required: true,
+            },
         },
         kategori: [
             {
