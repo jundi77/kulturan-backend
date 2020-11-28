@@ -32,8 +32,12 @@ function verifyToken(options) {
                         if (options && options.sendUserData === true) {
                             return res.status(200).json(res.locals.user);
                         }
-                        next();
+                        return next();
                     }
+                    return res.status(400).json({
+                        status: 'failed',
+                        msg: 'Invalid user',
+                    });
                 })
                 .catch((err) => console.error(err));
         } catch (error) {
