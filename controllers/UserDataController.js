@@ -20,13 +20,21 @@ function editAccount(req, res) {
         }
         User.findOne({ _id: res.locals.user.data.id })
             .then((user) => {
-                // nyari user yang emailnya sama
+                if (!user) {
+                    return res.status(400).json({
+                        status: 'failed',
+                        msg: 'Invalid user',
+                    });
+                }
+
                 user.name = req.body.hasOwnProperty('name')
                     ? req.body.name
                     : user.name;
+
                 if (req.body.hasOwnProperty('email')) {
                     user.email = req.body.email;
                 }
+
                 if (req.body.hasOwnProperty('newPassword')) {
                     bcrypt
                         .compare(req.body.password, user.password)
@@ -52,45 +60,53 @@ function editAccount(req, res) {
                         });
                 }
 
-                user.save().then((user) => {
-                    /**
-                     * Payload untuk JWT **
-                     * Ini bisa diparsing di client untuk digunakan sebagai data user,
-                     * namun tidak bisa diubah setelah token dibuat.
-                     */
-                    const payload = {
-                        id: user.id,
-                        email: user.email,
-                        name: user.name,
-                    };
+                user.save()
+                    .then((user) => {
+                        /**
+                         * Payload untuk JWT **
+                         * Ini bisa diparsing di client untuk digunakan sebagai data user,
+                         * namun tidak bisa diubah setelah token dibuat.
+                         */
+                        const payload = {
+                            id: user.id,
+                            email: user.email,
+                            name: user.name,
+                        };
 
-                    JWT.sign(
-                        payload,
-                        process.env.secretOrKey,
-                        {
-                            expiresIn: 31556926, // a year
-                        },
-                        (err, token) => {
-                            if (err) {
-                                console.error(err);
-                                throw err;
+                        JWT.sign(
+                            payload,
+                            process.env.secretOrKey,
+                            {
+                                expiresIn: 31556926, // a year
+                            },
+                            (err, token) => {
+                                if (err) {
+                                    console.error(err);
+                                    throw err;
+                                }
+                                res.status(200).json({
+                                    status: 'success',
+                                    data: {
+                                        token,
+                                        id: user.id,
+                                        name: user.name,
+                                        email: user.email,
+                                    },
+                                });
                             }
-                            res.status(200).json({
-                                status: 'success',
-                                data: {
-                                    token,
-                                    id: user.id,
-                                    name: user.name,
-                                    email: user.email,
-                                },
-                            });
-                        }
-                    );
-                });
+                        );
+                    })
+                    .catch((err) => {
+                        return res.status(400).json({
+                            status: 'failed',
+                            msg: 'Email telah terdaftar.',
+                        });
+                    });
             })
             .catch((err) => {
                 return res.status(400).json({
                     status: 'failed',
+                    msg: 'Server mengalami gangguan',
                 });
             });
     } catch (err) {
