@@ -118,7 +118,7 @@ function editAccount(req, res) {
 }
 function getKeranjang(req, res) {
     User.findOne({ _id: res.locals.user.data.id })
-        .populate('videos')
+        .populate('keranjang')
         .then((user) => {
             return res.status(200).json({
                 status: 'success',
@@ -155,7 +155,7 @@ function addToKeranjang(req, res) {
                 }
             });
             User.findOne({ _id: res.locals.user.data.id })
-                .populate('videos')
+                .populate('keranjang')
                 .then((user) => {
                     if (
                         !user.keranjang.find(
@@ -211,7 +211,7 @@ function removeFromKeranjang(req, res) {
                     if (err) throw err;
                 });
             User.findOne({ _id: res.locals.user.data.id })
-                .populate('videos')
+                .populate('keranjang')
                 .then((user) => {
                     let index = keranjang.findIndex(
                         (videoID) => videoID == req.body.videoID
@@ -242,7 +242,7 @@ function removeFromKeranjang(req, res) {
 
 function getFavorit(req, res) {
     User.findOne({ _id: res.locals.user.data.id })
-        .populate('videos')
+        .populate('favorit')
         .then((user) => {
             return res.status(200).json({
                 status: 'success',
@@ -286,7 +286,7 @@ function addToFavorit(req, res) {
                     if (err) throw err;
                 });
             User.findOne({ _id: res.locals.user.data.id })
-                .populate('videos')
+                .populate('favorit')
                 .then((user) => {
                     if (
                         !user.favorit.find(
@@ -345,7 +345,7 @@ function removeFromFavorit(req, res) {
                     if (err) throw err;
                 });
             User.findOne({ _id: res.locals.user.data.id })
-                .populate('videos')
+                .populate('favorit')
                 .then((user) => {
                     let index = favorit.findIndex(
                         (videoID) => videoID == req.body.videoID
