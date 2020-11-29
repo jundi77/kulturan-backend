@@ -27,6 +27,10 @@ const VideoSchema = new Schema(
             type: String,
             required: true,
         },
+        place: {
+            type: String,
+            required: true,
+        },
         pementas: {
             type: String,
             required: true,
@@ -47,9 +51,10 @@ const VideoSchema = new Schema(
                 required: true,
             },
         },
-        kategori: [
+        categories: [
             {
                 type: mongoose.Types.ObjectId,
+                ref: 'categories',
             },
         ],
     },

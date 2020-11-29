@@ -11,7 +11,7 @@ function editAccount(req, res) {
         if (!isValid) {
             errors = { msg: errors };
             errors.status = 'failed';
-            return res.status(400).json(errors);
+            return res.status(200).json(errors);
         }
         if (empty) {
             return res.status(200).json({
@@ -21,7 +21,7 @@ function editAccount(req, res) {
         User.findOne({ _id: res.locals.user.data.id })
             .then((user) => {
                 if (!user) {
-                    return res.status(400).json({
+                    return res.status(200).json({
                         status: 'failed',
                         msg: 'Invalid user',
                     });
@@ -42,7 +42,7 @@ function editAccount(req, res) {
                             if (!isMatch) {
                                 errors.status = 'failed';
                                 errors.msg = 'Password salah';
-                                return res.status(400).json(errors);
+                                return res.status(200).json(errors);
                             }
 
                             bcrypt.genSalt(10, (err, salt) => {
@@ -97,21 +97,21 @@ function editAccount(req, res) {
                         );
                     })
                     .catch((err) => {
-                        return res.status(400).json({
+                        return res.status(200).json({
                             status: 'failed',
                             msg: 'Email telah terdaftar.',
                         });
                     });
             })
             .catch((err) => {
-                return res.status(400).json({
+                return res.status(200).json({
                     status: 'failed',
                     msg: 'Server mengalami gangguan',
                 });
             });
     } catch (err) {
         console.error(err);
-        return res.status(400).json({
+        return res.status(200).json({
             status: 'failed',
         });
     }
@@ -127,7 +127,7 @@ function getKeranjang(req, res) {
             });
         })
         .catch((err) => {
-            return res.status(400).json({
+            return res.status(200).json({
                 status: 'failed',
             });
         });
@@ -136,7 +136,7 @@ function addToKeranjang(req, res) {
     try {
         if (req.body.hasOwnProperty('videoID')) {
             if (!objectID.isValid(req.body.videoID)) {
-                return res.status(400).json({
+                return res.status(200).json({
                     status: 'failed',
                     msg: {
                         videoID: 'ID video tidak valid',
@@ -145,7 +145,7 @@ function addToKeranjang(req, res) {
             }
             Video.findOne({ _id: req.body.videoID }).then((video) => {
                 if (!video) {
-                    return res.status(400).json({
+                    return res.status(200).json({
                         status: 'failed',
                         msg: {
                             videoID: 'Video tidak ditemukan',
@@ -177,7 +177,7 @@ function addToKeranjang(req, res) {
         }
     } catch (err) {
         console.error(err);
-        return res.status(400).json({
+        return res.status(200).json({
             status: 'failed',
         });
     }
@@ -187,7 +187,7 @@ function removeFromKeranjang(req, res) {
     try {
         if (req.body.hasOwnProperty('videoID')) {
             if (!objectID.isValid(req.body.videoID)) {
-                return res.status(400).json({
+                return res.status(200).json({
                     status: 'failed',
                     msg: {
                         videoID: 'ID video tidak valid',
@@ -197,7 +197,7 @@ function removeFromKeranjang(req, res) {
             Video.findOne({ _id: req.body.videoID })
                 .then((video) => {
                     if (!video) {
-                        return res.status(400).json({
+                        return res.status(200).json({
                             status: 'failed',
                             msg: {
                                 videoID: 'Video tidak ditemukan',
@@ -231,7 +231,7 @@ function removeFromKeranjang(req, res) {
         }
     } catch (err) {
         console.error(err);
-        return res.status(400).json({
+        return res.status(200).json({
             status: 'failed',
         });
     }
@@ -248,7 +248,7 @@ function getFavorit(req, res) {
             });
         })
         .catch((err) => {
-            return res.status(400).json({
+            return res.status(200).json({
                 status: 'failed',
             });
         });
@@ -258,7 +258,7 @@ function addToFavorit(req, res) {
     try {
         if (req.body.hasOwnProperty('videoID')) {
             if (!objectID.isValid(req.body.videoID)) {
-                return res.status(400).json({
+                return res.status(200).json({
                     status: 'failed',
                     msg: {
                         videoID: 'ID video tidak valid',
@@ -269,7 +269,7 @@ function addToFavorit(req, res) {
             Video.findOne({ _id: req.body.videoID })
                 .then((video) => {
                     if (!video) {
-                        return res.status(400).json({
+                        return res.status(200).json({
                             status: 'failed',
                             msg: {
                                 videoID: 'Video tidak ditemukan',
@@ -307,7 +307,7 @@ function addToFavorit(req, res) {
         }
     } catch (err) {
         console.error(err);
-        return res.status(400).json({
+        return res.status(200).json({
             status: 'failed',
         });
     }
@@ -316,7 +316,7 @@ function removeFromFavorit(req, res) {
     try {
         if (req.body.hasOwnProperty('videoID')) {
             if (!objectID.isValid(req.body.videoID)) {
-                return res.status(400).json({
+                return res.status(200).json({
                     status: 'failed',
                     msg: {
                         videoID: 'ID video tidak valid',
@@ -327,7 +327,7 @@ function removeFromFavorit(req, res) {
             Video.findOne({ _id: req.body.videoID })
                 .then((video) => {
                     if (!video) {
-                        return res.status(400).json({
+                        return res.status(200).json({
                             status: 'failed',
                             msg: {
                                 videoID: 'Video tidak ditemukan',
@@ -364,7 +364,7 @@ function removeFromFavorit(req, res) {
         }
     } catch (err) {
         console.error(err);
-        return res.status(400).json({
+        return res.status(200).json({
             status: 'failed',
         });
     }

@@ -20,12 +20,14 @@ const UserSchema = new Schema(
             {
                 // refer ke id video
                 type: mongoose.Types.ObjectId,
+                ref: 'videos',
             },
         ],
         favorit: [
             {
                 // refer ke id video
                 type: mongoose.Types.ObjectId,
+                ref: 'videos',
             },
         ],
         paymentHistory: [

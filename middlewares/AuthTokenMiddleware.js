@@ -6,7 +6,7 @@ function verifyToken(options) {
         const jwtFromRequest = ExtractJwt.fromAuthHeaderAsBearerToken();
         const token = jwtFromRequest(req);
         if (!token) {
-            res.status(401).json({
+            res.status(200).json({
                 status: 'failed',
                 msg: 'Bearer token is required',
             });
@@ -20,7 +20,7 @@ function verifyToken(options) {
                     if (user) {
                         const { id, name, email } = user;
                         if (decoded.email !== user.email) {
-                            return res.status(400).json({
+                            return res.status(200).json({
                                 status: 'failed',
                                 msg: 'Invalid token',
                             });
@@ -34,7 +34,7 @@ function verifyToken(options) {
                         }
                         return next();
                     }
-                    return res.status(400).json({
+                    return res.status(200).json({
                         status: 'failed',
                         msg: 'Invalid user',
                     });
@@ -42,7 +42,7 @@ function verifyToken(options) {
                 .catch((err) => console.error(err));
         } catch (error) {
             return res
-                .status(400)
+                .status(200)
                 .json({ status: 'failed', msg: 'Invalid token' });
         }
     };

@@ -9,7 +9,7 @@ const LoginController = (req, res) => {
     if (!isValid) {
         errors = { msg: errors };
         errors.status = 'failed';
-        return res.status(400).json(errors);
+        return res.status(200).json(errors);
     }
 
     User.findOne({ email: req.body.email })
@@ -17,7 +17,7 @@ const LoginController = (req, res) => {
             if (!user) {
                 errors.status = 'failed';
                 errors.msg = 'Email atau password salah';
-                return res.status(400).json(errors);
+                return res.status(200).json(errors);
                 // return res.send(errors);
             }
 
@@ -26,7 +26,7 @@ const LoginController = (req, res) => {
                 if (!isMatch) {
                     errors.status = 'failed';
                     errors.msg = 'Email atau password salah';
-                    return res.status(400).json(errors);
+                    return res.status(200).json(errors);
                 }
 
                 /**

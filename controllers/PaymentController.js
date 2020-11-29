@@ -9,7 +9,6 @@ function buy(req, res) {
             secure: true,
         },
     };
-    console.log('ready' + ' ' + parameter);
     global.kulturan.midtrans.snap
         .createTransaction(parameter)
         .then((transaction) => {
@@ -24,7 +23,7 @@ function buy(req, res) {
         })
         .catch((err) => {
             console.error(err);
-            return res.status(400).json({
+            return res.status(200).json({
                 status: 'failed',
             });
         });
