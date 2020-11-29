@@ -5,7 +5,7 @@ function getAll(req, res) {
     let videos = null;
     Video.find({})
         .populate('categories')
-        .select(['-link.stage', '-link.trailer'])
+        .select(['-link.stage', '-link.trailer', '-description'])
         .then((videos) => {
             return res.status(200).json({
                 status: 'success',
