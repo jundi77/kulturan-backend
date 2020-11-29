@@ -118,7 +118,11 @@ function editAccount(req, res) {
 }
 function getKeranjang(req, res) {
     User.findOne({ _id: res.locals.user.data.id })
-        .populate('keranjang')
+        .populate({
+            path: 'keranjang',
+            model: 'videos',
+            select: ['link.thumbnail', 'title', 'pementas', 'price'],
+        })
         .then((user) => {
             return res.status(200).json({
                 status: 'success',
@@ -155,7 +159,11 @@ function addToKeranjang(req, res) {
                 }
             });
             User.findOne({ _id: res.locals.user.data.id })
-                .populate('keranjang')
+                .populate({
+                    path: 'keranjang',
+                    model: 'videos',
+                    select: ['link.thumbnail', 'title', 'pementas', 'price'],
+                })
                 .then((user) => {
                     if (
                         !user.keranjang.find(
@@ -211,7 +219,11 @@ function removeFromKeranjang(req, res) {
                     if (err) throw err;
                 });
             User.findOne({ _id: res.locals.user.data.id })
-                .populate('keranjang')
+                .populate({
+                    path: 'keranjang',
+                    model: 'videos',
+                    select: ['link.thumbnail', 'title', 'pementas', 'price'],
+                })
                 .then((user) => {
                     let index = keranjang.findIndex(
                         (videoID) => videoID == req.body.videoID
@@ -242,7 +254,11 @@ function removeFromKeranjang(req, res) {
 
 function getFavorit(req, res) {
     User.findOne({ _id: res.locals.user.data.id })
-        .populate('favorit')
+        .populate({
+            path: 'favorit',
+            model: 'videos',
+            select: ['link.thumbnail', 'title', 'pementas', 'price'],
+        })
         .then((user) => {
             return res.status(200).json({
                 status: 'success',
@@ -286,7 +302,11 @@ function addToFavorit(req, res) {
                     if (err) throw err;
                 });
             User.findOne({ _id: res.locals.user.data.id })
-                .populate('favorit')
+                .populate({
+                    path: 'favorit',
+                    model: 'videos',
+                    select: ['link.thumbnail', 'title', 'pementas', 'price'],
+                })
                 .then((user) => {
                     if (
                         !user.favorit.find(
@@ -345,7 +365,11 @@ function removeFromFavorit(req, res) {
                     if (err) throw err;
                 });
             User.findOne({ _id: res.locals.user.data.id })
-                .populate('favorit')
+                .populate({
+                    path: 'favorit',
+                    model: 'videos',
+                    select: ['link.thumbnail', 'title', 'pementas', 'price'],
+                })
                 .then((user) => {
                     let index = favorit.findIndex(
                         (videoID) => videoID == req.body.videoID
