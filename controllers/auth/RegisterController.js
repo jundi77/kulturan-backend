@@ -9,7 +9,7 @@ const RegisterController = (req, res) => {
     if (!isValid) {
         errors = { msg: errors };
         errors.status = 'failed';
-        res.status(200).json(errors);
+        res.status(400).json(errors);
         return;
     }
 
@@ -19,7 +19,7 @@ const RegisterController = (req, res) => {
             if (user) {
                 errors.status = 'failed';
                 errors.msg = 'Email telah terdaftar';
-                res.status(200).json(errors);
+                res.status(400).json(errors);
                 return;
             }
 
