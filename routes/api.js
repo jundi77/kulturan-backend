@@ -44,12 +44,11 @@ function videoRoute(app) {
     let router = express.Router();
 
     router.get('/', VideoController.getAll);
-    router.get('/:videoid', VideoController.getFromID); // ambil hal dasar
-    router.post(
+    router.get(
         '/:videoid',
-        AuthTokenMiddleware(),
-        VideoController.getPremiumLink
-    ); // harus sudah beli, ini berarti minta link non trailer
+        AuthTokenMiddleware({ nextWhenNoToken: true }),
+        VideoController.getFromID
+    );
 
     app.use('/video', router);
 }
