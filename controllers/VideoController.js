@@ -72,5 +72,4 @@ function getFromID(req, res) {
 module.exports = {
     getAll,
     getFromID,
-    getPremiumLink,
 };
