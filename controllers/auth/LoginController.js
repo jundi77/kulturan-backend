@@ -61,7 +61,13 @@ const LoginController = (req, res) => {
                 );
             });
         })
-        .catch((err) => console.error(err));
+        .catch((err) => {
+            console.error(err);
+            return res.status(400).json({
+                status: 'failed',
+                msg: 'DB ERROR',
+            });
+        });
 };
 
 module.exports = LoginController;

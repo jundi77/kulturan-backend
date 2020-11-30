@@ -25,11 +25,22 @@ function buy(req, res) {
             console.error(err);
             return res.status(400).json({
                 status: 'failed',
+                msg: 'DB ERROR',
             });
         });
 }
-function getStruct(req, res) {}
-function midtransReceiver(req, res) {}
+function getStruct(req, res) {
+    return res.status(400).json({
+        status: 'failed',
+        msg: 'OND',
+    });
+}
+function midtransReceiver(req, res) {
+    return res.status(400).json({
+        status: 'failed',
+        msg: 'OND',
+    });
+}
 
 module.exports = {
     buy,

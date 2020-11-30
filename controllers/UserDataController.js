@@ -45,17 +45,37 @@ function editAccount(req, res) {
                                 return res.status(400).json(errors);
                             }
 
-                            bcrypt.genSalt(10, (err, salt) => {
-                                bcrypt.hash(
-                                    req.body.password,
-                                    salt,
-                                    (err, hash) => {
-                                        if (err) {
-                                            console.error(err);
-                                        }
-                                        user.password = hash;
-                                    }
-                                );
+                            bcrypt
+                                .genSalt(10, (err, salt) => {
+                                    bcrypt
+                                        .hash(
+                                            req.body.password,
+                                            salt,
+                                            (err, hash) => {
+                                                if (err) {
+                                                    console.error(err);
+                                                }
+                                                user.password = hash;
+                                            }
+                                        )
+                                        .catch((err) => {
+                                            return res.status(400).json({
+                                                status: 'failed',
+                                                msg: 'DB ERROR',
+                                            });
+                                        });
+                                })
+                                .catch((err) => {
+                                    return res.status(400).json({
+                                        status: 'failed',
+                                        msg: 'SERVER ERROR',
+                                    });
+                                });
+                        })
+                        .catch((err) => {
+                            return res.status(400).json({
+                                status: 'failed',
+                                msg: 'SERVER ERROR',
                             });
                         });
                 }
@@ -106,13 +126,14 @@ function editAccount(req, res) {
             .catch((err) => {
                 return res.status(400).json({
                     status: 'failed',
-                    msg: 'Server mengalami gangguan',
+                    msg: 'DB ERROR',
                 });
             });
     } catch (err) {
         console.error(err);
         return res.status(400).json({
             status: 'failed',
+            msg: 'SERVER ERROR',
         });
     }
 }
@@ -134,6 +155,7 @@ function getKeranjang(req, res) {
         .catch((err) => {
             return res.status(400).json({
                 status: 'failed',
+                msg: 'DB ERROR',
             });
         });
 }
@@ -148,16 +170,23 @@ function addToKeranjang(req, res) {
                     },
                 });
             }
-            Video.findOne({ _id: req.body.videoID }).then((video) => {
-                if (!video) {
+            Video.findOne({ _id: req.body.videoID })
+                .then((video) => {
+                    if (!video) {
+                        return res.status(400).json({
+                            status: 'failed',
+                            msg: {
+                                videoID: 'Video tidak ditemukan',
+                            },
+                        });
+                    }
+                })
+                .catch((err) => {
                     return res.status(400).json({
                         status: 'failed',
-                        msg: {
-                            videoID: 'Video tidak ditemukan',
-                        },
+                        msg: 'DB ERROR',
                     });
-                }
-            });
+                });
             User.findOne({ _id: res.locals.user.data.id })
                 .populate({
                     path: 'keranjang',
@@ -171,24 +200,35 @@ function addToKeranjang(req, res) {
                         )
                     ) {
                         user.keranjang.push(req.body.videoID);
-                        user.save().then((user) => {
-                            return res.status(200).json({
-                                status: 'success',
-                                data: {
-                                    keranjang: user.keranjang,
-                                },
+                        user.save()
+                            .then((user) => {
+                                return res.status(200).json({
+                                    status: 'success',
+                                    data: {
+                                        keranjang: user.keranjang,
+                                    },
+                                });
+                            })
+                            .catch((err) => {
+                                return res.status(400).json({
+                                    status: 'failed',
+                                    msg: 'DB ERROR',
+                                });
                             });
-                        });
                     }
                 })
                 .catch((err) => {
-                    if (err) throw err;
+                    return res.status(400).json({
+                        status: 'failed',
+                        msg: 'DB ERROR',
+                    });
                 });
         }
     } catch (err) {
         console.error(err);
         return res.status(400).json({
             status: 'failed',
+            msg: 'DB ERROR',
         });
     }
 }
@@ -216,7 +256,10 @@ function removeFromKeranjang(req, res) {
                     }
                 })
                 .catch((err) => {
-                    if (err) throw err;
+                    return res.status(400).json({
+                        status: 'failed',
+                        msg: 'DB ERROR',
+                    });
                 });
             User.findOne({ _id: res.locals.user.data.id })
                 .populate({
@@ -230,24 +273,35 @@ function removeFromKeranjang(req, res) {
                     );
                     if (index) {
                         user.keranjang.splice(index, 1);
-                        user.save().then((user) => {
-                            return res.status(200).json({
-                                status: 'success',
-                                data: {
-                                    keranjang: user.keranjang,
-                                },
+                        user.save()
+                            .then((user) => {
+                                return res.status(200).json({
+                                    status: 'success',
+                                    data: {
+                                        keranjang: user.keranjang,
+                                    },
+                                });
+                            })
+                            .catch((err) => {
+                                return res.status(400).json({
+                                    status: 'failed',
+                                    msg: 'DB ERROR',
+                                });
                             });
-                        });
                     }
                 })
                 .catch((err) => {
-                    if (err) throw err;
+                    return res.status(400).json({
+                        status: 'failed',
+                        msg: 'DB ERROR',
+                    });
                 });
         }
     } catch (err) {
         console.error(err);
         return res.status(400).json({
             status: 'failed',
+            msg: 'DB ERROR',
         });
     }
 }
@@ -270,6 +324,7 @@ function getFavorit(req, res) {
         .catch((err) => {
             return res.status(400).json({
                 status: 'failed',
+                msg: 'DB ERROR',
             });
         });
 }
@@ -299,7 +354,10 @@ function addToFavorit(req, res) {
                     videoFound = video;
                 })
                 .catch((err) => {
-                    if (err) throw err;
+                    return res.status(400).json({
+                        status: 'failed',
+                        msg: 'DB ERROR',
+                    });
                 });
             User.findOne({ _id: res.locals.user.data.id })
                 .populate({
@@ -316,24 +374,35 @@ function addToFavorit(req, res) {
                         user.favorit.push(req.body.videoID);
                         ++videoFound.favorit;
                         videoFound.save();
-                        user.save().then((user) => {
-                            return res.status(200).json({
-                                status: 'success',
-                                data: {
-                                    favorit: user.favorit,
-                                },
+                        user.save()
+                            .then((user) => {
+                                return res.status(200).json({
+                                    status: 'success',
+                                    data: {
+                                        favorit: user.favorit,
+                                    },
+                                });
+                            })
+                            .catch((err) => {
+                                return res.status(400).json({
+                                    status: 'failed',
+                                    msg: 'DB ERROR',
+                                });
                             });
-                        });
                     }
                 })
                 .catch((err) => {
-                    if (err) throw err;
+                    return res.status(400).json({
+                        status: 'failed',
+                        msg: 'DB ERROR',
+                    });
                 });
         }
     } catch (err) {
         console.error(err);
         return res.status(400).json({
             status: 'failed',
+            msg: 'DB ERROR',
         });
     }
 }
@@ -362,7 +431,10 @@ function removeFromFavorit(req, res) {
                     videoFound = video;
                 })
                 .catch((err) => {
-                    if (err) throw err;
+                    return res.status(400).json({
+                        status: 'failed',
+                        msg: 'DB ERROR',
+                    });
                 });
             User.findOne({ _id: res.locals.user.data.id })
                 .populate({
@@ -378,24 +450,35 @@ function removeFromFavorit(req, res) {
                         user.favorit.splice(index, 1);
                         --videoFound.favorit;
                         videoFound.save();
-                        user.save().then((user) => {
-                            return res.status(200).json({
-                                status: 'success',
-                                data: {
-                                    favorit: user.favorit,
-                                },
+                        user.save()
+                            .then((user) => {
+                                return res.status(200).json({
+                                    status: 'success',
+                                    data: {
+                                        favorit: user.favorit,
+                                    },
+                                });
+                            })
+                            .catch((err) => {
+                                return res.status(400).json({
+                                    status: 'failed',
+                                    msg: 'DB ERROR',
+                                });
                             });
-                        });
                     }
                 })
                 .catch((err) => {
-                    if (err) throw err;
+                    return res.status(400).json({
+                        status: 'failed',
+                        msg: 'DB ERROR',
+                    });
                 });
         }
     } catch (err) {
         console.error(err);
         return res.status(400).json({
             status: 'failed',
+            msg: 'DB ERROR',
         });
     }
 }
