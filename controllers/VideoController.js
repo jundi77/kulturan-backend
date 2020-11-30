@@ -29,6 +29,10 @@ function checkPayment(videoID, user) {
 
 function getFromID(req, res) {
     if (mongoose.Types.ObjectId.isValid(req.params.videoid)) {
+        return res.status(400).json({
+            status: 'OND',
+            data: req.params.videoid,
+        });
         let id = req.params.videoid;
         let video = Video.findById(id);
         if (res.locals && res.locals.user) {
