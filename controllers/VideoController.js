@@ -29,7 +29,7 @@ function checkPayment(videoID, user) {
 function getFromID(req, res) {
     if (mongoose.Types.ObjectId.isValid(req.params.videoid)) {
         let id = req.params.videoid;
-        let video = Video.findById(id).populate('categories');
+        let video = Video.findById(id);
         if (res.locals && res.locals.user) {
             // kalau sudah ready, ini jalan
             if (checkPayment(id, res.locals.user)) {
@@ -40,6 +40,7 @@ function getFromID(req, res) {
         }
 
         video
+            .populate('categories')
             .then((video) => {
                 if (video) {
                     return res.status(200).json({
