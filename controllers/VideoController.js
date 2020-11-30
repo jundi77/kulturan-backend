@@ -28,51 +28,40 @@ function checkPayment(videoID, user) {
 }
 
 function getFromID(req, res) {
-    if (mongoose.Types.ObjectId.isValid(req.params.videoid)) {
-        return res.status(400).json({
-            status: 'OND',
-            data: req.params.videoid,
-        });
-        let id = req.params.videoid;
-        let video = Video.findById(id);
-        if (res.locals && res.locals.user) {
-            // kalau sudah ready, ini jalan
-            if (checkPayment(id, res.locals.user)) {
-                video = video.select(['-link.stage']); // sementara belum ngecek sudah mbayar atau belum
-            }
-        } else {
+    let id = req.params.videoid;
+    let video = Video.findById(id);
+    if (res.locals && res.locals.user) {
+        // kalau sudah ready, ini jalan
+        if (checkPayment(id, res.locals.user)) {
             video = video.select(['-link.stage']); // sementara belum ngecek sudah mbayar atau belum
         }
-
-        video
-            .populate('categories')
-            .then((video) => {
-                if (video) {
-                    return res.status(200).json({
-                        status: 'success',
-                        data: {
-                            video,
-                        },
-                    });
-                }
-                return res.status(400).json({
-                    status: 'failed',
-                    msg: 'Video tidak ditemukan',
-                });
-            })
-            .catch((err) => {
-                console.error(err);
-                return res.status(400).json({
-                    status: 'failed',
-                    msg: 'DB ERROR',
-                });
-            });
+    } else {
+        video = video.select(['-link.stage']); // sementara belum ngecek sudah mbayar atau belum
     }
 
-    return res.status(400).json({
-        status: 'failed',
-        msg: 'ID video invalid',
-    });
+    video
+        .populate('categories')
+        .then((video) => {
+            if (video) {
+                return res.status(200).json({
+                    status: 'success',
+                    data: {
+                        video,
+                    },
+                });
+            }
+            return res.status(400).json({
+                status: 'failed',
+                msg: 'Video tidak ditemukan',
+            });
+        })
+        .catch((err) => {
+            console.error(err);
+            return res.status(400).json({
+                status: 'failed',
+                msg: 'DB ERROR',
+            });
+        });
 }
 
 module.exports = {
