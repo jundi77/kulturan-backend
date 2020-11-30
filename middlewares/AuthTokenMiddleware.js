@@ -6,11 +6,13 @@ function verifyToken(options) {
         const jwtFromRequest = ExtractJwt.fromAuthHeaderAsBearerToken();
         const token = jwtFromRequest(req);
         if (!token) {
-            res.status(401).json({
+            if (options && options.nextWhenNoToken === true) {
+                return next();
+            }
+            return res.status(401).json({
                 status: 'failed',
                 msg: 'Bearer token is required',
             });
-            return;
         }
 
         try {
