@@ -1,8 +1,7 @@
+const mongoose = require('mongoose');
 const Video = require('../models/Video');
-const Kategori = require('../models/Kategori');
 
 function getAll(req, res) {
-    let videos = null;
     Video.find({})
         .populate('categories')
         .select(['link.thumbnail', 'title', 'pementas', 'price'])
@@ -16,17 +15,59 @@ function getAll(req, res) {
         })
         .catch((err) => {
             console.error(err);
-            return res.status(200).json({
+            return res.status(400).json({
                 status: 'failed',
+                msg: 'DB ERROR',
             });
         });
 }
 
-const getFromID = (req, res) => {
-    return res.status(200).json(req.params);
-};
+function checkPayment(videoID, user) {
+    return null;
+}
 
-function getPremiumLink(req, res) {}
+function getFromID(req, res) {
+    if (mongoose.Types.ObjectId.isValid(req.params.videoid)) {
+        let id = req.params.videoid;
+        let video = Video.findById(id).populate('categories');
+        if (res.locals && res.locals.user) {
+            // kalau sudah ready, ini jalan
+            if (checkPayment(id, res.locals.user)) {
+                video = video.select(['-link.stage']); // sementara belum ngecek sudah mbayar atau belum
+            }
+        } else {
+            video = video.select(['-link.stage']); // sementara belum ngecek sudah mbayar atau belum
+        }
+
+        video
+            .then((video) => {
+                if (video) {
+                    return res.status(200).json({
+                        status: 'success',
+                        data: {
+                            video,
+                        },
+                    });
+                }
+                return res.status(400).json({
+                    status: 'failed',
+                    msg: 'Video tidak ditemukan',
+                });
+            })
+            .catch((err) => {
+                console.error(err);
+                return res.status(400).json({
+                    status: 'failed',
+                    msg: 'DB ERROR',
+                });
+            });
+    }
+
+    return res.status(400).json({
+        status: 'failed',
+        msg: 'ID video invalid',
+    });
+}
 
 module.exports = {
     getAll,
