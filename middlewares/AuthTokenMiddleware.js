@@ -5,6 +5,8 @@ function verifyToken(options) {
     return function (req, res, next) {
         const jwtFromRequest = ExtractJwt.fromAuthHeaderAsBearerToken();
         const token = jwtFromRequest(req);
+        console.debug(req);
+        console.log(res);
         if (!token) {
             if (options && options.nextWhenNoToken === true) {
                 return next();
