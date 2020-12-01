@@ -6,6 +6,9 @@ function verifyToken(options) {
         const jwtFromRequest = ExtractJwt.fromAuthHeaderAsBearerToken();
         const token = jwtFromRequest(req);
         console.debug(req);
+        console.debug('jwtfromrequest:\n');
+        console.debug(jwtFromRequest);
+        console.debug('token: ' + token);
         console.log(res);
         if (!token) {
             if (options && options.nextWhenNoToken === true) {
