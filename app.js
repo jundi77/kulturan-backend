@@ -33,11 +33,12 @@ global.kulturan.midtrans.snap = new midtransClient.Snap({
  *
  * https://stackoverflow.com/questions/11321635/nodejs-express-what-is-app-use#11321828
  */
+// cors global
+app.use(cors());
+
 // parse body ke json
 app.use(express.json());
 
-// cors global
-app.use(cors());
 
 // connect ke mongoooooooooodb
 mongoose
