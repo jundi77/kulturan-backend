@@ -72,40 +72,41 @@ function buy(req, res) {
                                 merchant_name: video.pementas,
                             },
                         ];
-                        User.findById(res.locals.user.data.id)
+                        User.findOne({ _id: res.locals.user.data.id })
                             .then((user) => {
-                                if (user) {
-                                    let index = user.keranjang.findIndex(
-                                        (videoID) => videoID == video._id
-                                    );
-                                    if (index > -1) {
-                                        user.keranjang.splice(index, 1);
-                                    }
-                                    user.save((err) => {
-                                        if (err) {
-                                            console.error(err);
-                                        }
-                                        return makePembayaran(res, parameter, {
-                                            userID: res.locals.user.data.id,
-                                            paymentDetails: {
-                                                item_details:
-                                                    parameter.item_details,
-                                            },
-                                            totalPrice: video.price,
+                                let index = user.keranjang.findIndex(
+                                    (videoID) => videoID == req.body.videoID
+                                );
+                                if (index > -1) {
+                                    user.keranjang.splice(index, 1);
+                                    user.save()
+                                        .then((user) => {
+                                            return makePembayaran(
+                                                res,
+                                                parameter,
+                                                {
+                                                    userID:
+                                                        res.locals.user.data.id,
+                                                    paymentDetails: {
+                                                        item_details:
+                                                            parameter.item_details,
+                                                    },
+                                                    totalPrice: video.price,
+                                                }
+                                            );
+                                        })
+                                        .catch((err) => {
+                                            return res.status(400).json({
+                                                status: 'failed',
+                                                msg: 'DB ERROR',
+                                            });
                                         });
-                                    });
-                                } else {
-                                    return res.status(400).json({
-                                        status: 'failed',
-                                        msg: 'User tidak ditemukan',
-                                    });
                                 }
                             })
                             .catch((err) => {
-                                console.error(err);
                                 return res.status(400).json({
                                     status: 'failed',
-                                    msg: 'DB ERROR for user',
+                                    msg: 'DB ERROR',
                                 });
                             });
                     } else {
