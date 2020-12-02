@@ -116,7 +116,11 @@ function buy(req, res) {
         // ambil dari keranjang
         User.findById(res.locals.user.data.id)
             .select('keranjang')
-            .populate('videos')
+            .populate({
+                path: 'keranjang',
+                model: 'videos',
+                select: ['title', 'price', 'pementas'],
+            })
             .then((user) => {
                 if (user) {
                     console.log(user.keranjang[0]);
