@@ -186,9 +186,11 @@ function getStruct(req, res) {
     });
 }
 function midtransReceiver(req, res) {
-    return res.status(400).json({
-        status: 'failed',
-        msg: 'OND',
+    return res.status(200).json({
+        status: 'success',
+        data: {
+            headers: req.headers,
+        },
     });
 }
 

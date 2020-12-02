@@ -2,14 +2,22 @@ function checkRequestOrigin(options) {
     return function (req, res, next) {
         if (options && options.log === true) {
             console.debug(req.headers);
-            return res.status(200).json({
-                status: 'success',
-                data: {
-                    headers: req.headers,
-                },
+        }
+        if (
+            req.headers['user-agent'] === 'Veritrans' &&
+            ((req.headers['x-forwarded-for'] instanceof Array &&
+                req.headers['x-forwarded-for'].find(
+                    (ip) => ip === '103.58.103.177'
+                )) ||
+                req.headers['x-forwarded-for'] === '103.58.103.177')
+        ) {
+            return next();
+        } else {
+            return res.status(401).json({
+                status: 'failed',
+                msg: 'Who are you?',
             });
         }
-        return next();
     };
 }
 
