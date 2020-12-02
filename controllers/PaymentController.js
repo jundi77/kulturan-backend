@@ -28,29 +28,21 @@ function payWithSnap(res, parameter) {
 
 function makePembayaran(res, snapParameter, data) {
     let newPembayaran = new Pembayaran(data);
-    newPembayaran
-        .save((err) => {
-            if (err) {
-                console.error(err);
-                return res.status(400).json({
-                    status: 'failed',
-                    msg: 'DB ERROR',
-                });
-            }
-            console.log(newPembayaran);
-            snapParameter.transaction_details = {
-                order_id: newPembayaran._id,
-                gross_amount: newPembayaran.totalPrice,
-            };
-            return payWithSnap(res, snapParameter);
-        })
-        .catch((err) => {
+    newPembayaran.save((err) => {
+        if (err) {
             console.error(err);
             return res.status(400).json({
                 status: 'failed',
                 msg: 'DB ERROR',
             });
-        });
+        }
+        console.log(newPembayaran);
+        snapParameter.transaction_details = {
+            order_id: newPembayaran._id,
+            gross_amount: newPembayaran.totalPrice,
+        };
+        return payWithSnap(res, snapParameter);
+    });
 }
 
 function buy(req, res) {
