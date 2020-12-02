@@ -122,6 +122,8 @@ function buy(req, res) {
                     let totalPrice = 0;
                     parameter.item_details = user.keranjang.map((video) => {
                         totalPrice += video.price;
+                        console.log(video.price);
+                        console.log(video.price instanceof Number);
                         console.log(totalPrice);
                         return {
                             id: video._id,
