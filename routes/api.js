@@ -28,10 +28,10 @@ const userRoute = (app) => {
     router.put('/edit-account', UserDataController.editAccount);
     router.get('/keranjang', UserDataController.getKeranjang);
     router.put('/keranjang', UserDataController.addToKeranjang);
-    router.delete('/keranjang', UserDataController.removeFromKeranjang);
+    router.put('/keranjang/delete', UserDataController.removeFromKeranjang);
     router.get('/favorit', UserDataController.getFavorit);
     router.put('/favorit', UserDataController.addToFavorit);
-    router.delete('/favorit', UserDataController.removeFromFavorit);
+    router.put('/favorit/delete', UserDataController.removeFromFavorit);
 
     app.use('/user', router);
 };
@@ -62,7 +62,14 @@ function paymentGatewayRoute(app) {
 
     router.post('/buy', AuthTokenMiddleware(), PaymentController.buy); // mau beli? Perlu add videoID yang array
     router.get('/struct', AuthTokenMiddleware(), PaymentController.getStruct);
-    router.post('/midtrans-receiver', PaymentController.midtransReceiver); // ambil notifikasi dari midtrans
+    router.post(
+        '/midtrans-payment-notification-receiver',
+        PaymentController.midtransReceiver
+    ); // ambil notifikasi dari midtrans, perlu verifikasi biar ga dimainin
+    router.post(
+        '/midtrans-recurring-notification-receiver',
+        PaymentController.midtransReceiver
+    ); // ambil notifikasi dari midtrans, perlu verifikasi biar ga dimainin
 
     app.use('/payment', router);
 }
