@@ -7,7 +7,6 @@ function checkRequestOrigin(options) {
                 status: 'success',
                 data: {
                     req,
-                    res,
                 },
             });
         }
