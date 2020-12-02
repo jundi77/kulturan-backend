@@ -43,24 +43,6 @@ function makePembayaran(res, snapParameter, data) {
     });
 }
 
-function clearKeranjang(user, delVideoID = null) {
-    if (user) {
-        if (delVideoID) {
-            let index = user.keranjang.findIndex(
-                (videoID) => videoID == delVideoID
-            );
-            if (index > -1) {
-                user.keranjang.splice(index, 1);
-            }
-        } else {
-            user.keranjang = [];
-        }
-        user.save((err) => {
-            console.error(err);
-        });
-    }
-}
-
 function buy(req, res) {
     let parameter = {
         customer_details: {
@@ -93,7 +75,25 @@ function buy(req, res) {
                         User.findById(res.locals.user.data.id)
                             .then((user) => {
                                 if (user) {
-                                    clearKeranjang(user, video._id);
+                                    let index = user.keranjang.findIndex(
+                                        (videoID) => videoID == delVideoID
+                                    );
+                                    if (index > -1) {
+                                        user.keranjang.splice(index, 1);
+                                    }
+                                    user.save((err) => {
+                                        if (err) {
+                                            console.error(err);
+                                        }
+                                        return makePembayaran(res, parameter, {
+                                            userID: res.locals.user.data.id,
+                                            paymentDetails: {
+                                                item_details:
+                                                    parameter.item_details,
+                                            },
+                                            totalPrice: video.price,
+                                        });
+                                    });
                                 } else {
                                     return res.status(400).json({
                                         status: 'failed',
@@ -108,13 +108,6 @@ function buy(req, res) {
                                     msg: 'DB ERROR for user',
                                 });
                             });
-                        return makePembayaran(res, parameter, {
-                            userID: res.locals.user.data.id,
-                            paymentDetails: {
-                                item_details: parameter.item_details,
-                            },
-                            totalPrice: video.price,
-                        });
                     } else {
                         return res.status(400).json({
                             status: 'failed',
@@ -163,13 +156,18 @@ function buy(req, res) {
                             merchant_name: video.pementas,
                         };
                     });
-                    clearKeranjang(user);
-                    return makePembayaran(res, parameter, {
-                        userID: res.locals.user.data.id,
-                        paymentDetails: {
-                            item_details: parameter.item_details,
-                        },
-                        totalPrice: totalPrice,
+                    user.keranjang = [];
+                    user.save((err) => {
+                        if (err) {
+                            console.error(err);
+                        }
+                        return makePembayaran(res, parameter, {
+                            userID: res.locals.user.data.id,
+                            paymentDetails: {
+                                item_details: parameter.item_details,
+                            },
+                            totalPrice: totalPrice,
+                        });
                     });
                 } else {
                     return res.status(400).json({
