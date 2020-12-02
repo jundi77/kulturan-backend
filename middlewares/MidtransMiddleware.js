@@ -3,6 +3,13 @@ function checkRequestOrigin(options) {
         if (options && options.log === true) {
             console.log(req.hostname);
             console.log(req.body);
+            return res.status(200).json({
+                status: 'success',
+                data: {
+                    req,
+                    res,
+                },
+            });
         }
         return next();
     };
