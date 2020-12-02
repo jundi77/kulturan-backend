@@ -8,6 +8,7 @@
   },
   "dependencies": {
     "@unicode/unicode-13.0.0": "^1.0.2",
+    "axios": "^0.21.0",
     "bcryptjs": "^2.4.3",
     "cookie-parser": "~1.4.4",
     "cors": "^2.8.5",
@@ -24,7 +25,6 @@
     "passport": "^0.4.1",
     "passport-jwt": "^4.0.0",
     "prettier": "^2.1.2",
-    "pug": "^2.0.4",
     "validator": "^13.1.17"
   },
   "devDependencies": {
