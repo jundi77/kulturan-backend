@@ -115,6 +115,7 @@ function buy(req, res) {
     } else {
         // ambil dari keranjang
         User.findById(res.locals.user.data.id)
+            .select('keranjang')
             .populate('videos')
             .then((user) => {
                 if (user) {
