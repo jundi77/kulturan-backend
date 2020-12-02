@@ -37,17 +37,16 @@ global.kulturan.midtrans.snap = new midtransClient.Snap({
 app.use(cors());
 
 // parse body ke json
-try {
-    app.use(express.json());
-} catch (err) {
-    console.error(err);
-    app.use('/', (req, res) => {
-        return res.status(501).json({
+app.use(express.json());
+app.use((err, req, res, next) => {
+    if (err) {
+        return res.status(401).json({
             status: 'failed',
-            msg: 'ERROR: NOT IMPLEMENTED FOR THIS REQUEST',
+            msg: 'bad request, attention please?',
         });
-    });
-}
+    }
+    return next();
+});
 
 // connect ke mongoooooooooodb
 mongoose
