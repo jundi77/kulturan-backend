@@ -70,6 +70,7 @@ function buy(req, res) {
         if (mongoose.Types.ObjectId.isValid(req.body.videoID)) {
             Video.findById(req.body.videoID)
                 .then((video) => {
+                    console.log(video);
                     if (video) {
                         parameter.item_details = [
                             {
