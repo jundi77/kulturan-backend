@@ -2,6 +2,7 @@ const express = require('express');
 const RegisterController = require('../controllers/auth/RegisterController');
 const LoginController = require('../controllers/auth/LoginController');
 const AuthTokenMiddleware = require('../middlewares/AuthTokenMiddleware');
+const MidtransMiddleware = require('../middlewares/MidtransMiddleware');
 const UserDataController = require('../controllers/UserDataController');
 const VideoController = require('../controllers/VideoController');
 const PaymentController = require('../controllers/PaymentController');
@@ -64,10 +65,12 @@ function paymentGatewayRoute(app) {
     router.get('/struct', AuthTokenMiddleware(), PaymentController.getStruct);
     router.post(
         '/midtrans-payment-notification-receiver',
+        MidtransMiddleware({ log: true }),
         PaymentController.midtransReceiver
     ); // ambil notifikasi dari midtrans, perlu verifikasi biar ga dimainin
     router.post(
         '/midtrans-recurring-notification-receiver',
+        MidtransMiddleware({ log: true }),
         PaymentController.midtransReceiver
     ); // ambil notifikasi dari midtrans, perlu verifikasi biar ga dimainin
 
