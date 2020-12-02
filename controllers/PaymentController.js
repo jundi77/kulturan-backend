@@ -30,16 +30,17 @@ function makePembayaran(res, snapParameter, data) {
     let newPembayaran = new Pembayaran(data);
     newPembayaran
         .save((err) => {
-            console.error(err);
-            return res.status(400).json({
-                status: 'failed',
-                msg: 'DB ERROR',
-            });
-        })
-        .then((pay_detail) => {
+            if (err) {
+                console.error(err);
+                return res.status(400).json({
+                    status: 'failed',
+                    msg: 'DB ERROR',
+                });
+            }
+            console.log(newPembayaran);
             snapParameter.transaction_details = {
-                order_id: pay_detail._id,
-                gross_amount: pay_detail.totalPrice,
+                order_id: newPembayaran._id,
+                gross_amount: newPembayaran.totalPrice,
             };
             return payWithSnap(res, snapParameter);
         })
