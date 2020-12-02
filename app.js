@@ -40,7 +40,7 @@ app.use(cors());
 app.use(express.json());
 app.use((err, req, res, next) => {
     if (err) {
-        return res.status(401).json({
+        return res.status(400).json({
             status: 'failed',
             msg: 'bad request, attention please?',
         });
