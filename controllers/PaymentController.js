@@ -4,7 +4,7 @@ const Video = require('../models/Video');
 const Pembayaran = require('../models/Pembayaran');
 const e = require('express');
 
-function payWithSnap(parameter) {
+function payWithSnap(res, parameter) {
     global.kulturan.midtrans.snap
         .createTransaction(parameter)
         .then((transaction) => {
@@ -26,7 +26,7 @@ function payWithSnap(parameter) {
         });
 }
 
-function makePembayaran(snapParameter, data) {
+function makePembayaran(res, snapParameter, data) {
     let newPembayaran = new Pembayaran(data);
     newPembayaran
         .save((err) => {
@@ -41,7 +41,7 @@ function makePembayaran(snapParameter, data) {
                 order_id: pay_detail._id,
                 gross_amount: pay_detail.totalPrice,
             };
-            return payWithSnap(snapParameter);
+            return payWithSnap(res, snapParameter);
         })
         .catch((err) => {
             console.error(err);
@@ -81,7 +81,7 @@ function buy(req, res) {
                                 merchant_name: video.pementas,
                             },
                         ];
-                        return makePembayaran(parameter, {
+                        return makePembayaran(res, parameter, {
                             userID: res.locals.user.data.id,
                             paymentDetails: {
                                 item_details: parameter.item_details,
@@ -132,7 +132,7 @@ function buy(req, res) {
                             merchant_name: video.pementas,
                         };
                     });
-                    return makePembayaran(parameter, {
+                    return makePembayaran(res, parameter, {
                         userID: res.locals.user.data.id,
                         paymentDetails: {
                             item_details: parameter.item_details,
