@@ -30,6 +30,13 @@ const UserSchema = new Schema(
                 ref: 'videos',
             },
         ],
+        pembayaran: [
+            {
+                // refer ke id pembayaran
+                type: mongoose.Types.ObjectId,
+                ref: 'payments',
+            },
+        ],
     },
     { timestamps: true }
 );
