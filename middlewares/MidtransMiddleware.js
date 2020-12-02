@@ -6,9 +6,7 @@ function checkRequestOrigin(options) {
             return res.status(200).json({
                 status: 'success',
                 data: {
-                    host: req.headers.host,
-                    origin: req.headers.origin,
-                    address: req.socket.remoteAddress,
+                    headers: req.headers,
                 },
             });
         }
