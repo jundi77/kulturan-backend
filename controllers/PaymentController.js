@@ -117,6 +117,7 @@ function buy(req, res) {
         User.findById(res.locals.user.id)
             .populate('videos')
             .then((user) => {
+                console.log(user);
                 if (user) {
                     let totalPrice = 0;
                     parameter.item_details = user.keranjang.map((video) => {
