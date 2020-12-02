@@ -214,6 +214,11 @@ function addToKeranjang(req, res) {
                     msg: 'DB ERROR',
                 });
             });
+    } else {
+        return res.status(401).json({
+            status: 'failed',
+            msg: 'videoID is required',
+        });
     }
 }
 
@@ -279,6 +284,11 @@ function removeFromKeranjang(req, res) {
                     msg: 'DB ERROR',
                 });
             });
+    } else {
+        return res.status(401).json({
+            status: 'failed',
+            msg: 'videoID is required',
+        });
     }
 }
 
@@ -370,6 +380,11 @@ function addToFavorit(req, res) {
                     msg: 'DB ERROR',
                 });
             });
+    } else {
+        return res.status(401).json({
+            status: 'failed',
+            msg: 'videoID is required',
+        });
     }
 }
 function removeFromFavorit(req, res) {
@@ -438,6 +453,11 @@ function removeFromFavorit(req, res) {
                     msg: 'DB ERROR',
                 });
             });
+    } else {
+        return res.status(401).json({
+            status: 'failed',
+            msg: 'videoID is required',
+        });
     }
 }
 
