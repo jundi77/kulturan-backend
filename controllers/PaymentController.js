@@ -119,6 +119,7 @@ function buy(req, res) {
             .populate('videos')
             .then((user) => {
                 if (user) {
+                    console.log(user.keranjang[0]);
                     let totalPrice = 0;
                     parameter.item_details = user.keranjang.map((video) => {
                         totalPrice += video.price;
