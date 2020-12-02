@@ -55,8 +55,8 @@ function makePembayaran(snapParameter, data) {
 function buy(req, res) {
     let parameter = {
         customer_details: {
-            first_name: res.locals.user.name, // perlu perhatian batas karakter nantinya
-            email: res.locals.user.email,
+            first_name: res.locals.user.data.name, // perlu perhatian batas karakter nantinya
+            email: res.locals.user.data.email,
         },
         credit_card: {
             secure: true,
@@ -82,7 +82,7 @@ function buy(req, res) {
                             },
                         ];
                         return makePembayaran(parameter, {
-                            userID: res.locals.user.id,
+                            userID: res.locals.user.data.id,
                             paymentDetails: {
                                 item_details: parameter.item_details,
                             },
@@ -114,10 +114,9 @@ function buy(req, res) {
         }
     } else {
         // ambil dari keranjang
-        User.findById(res.locals.user.id)
+        User.findById(res.locals.user.data.id)
             .populate('videos')
             .then((user) => {
-                console.log(user);
                 if (user) {
                     let totalPrice = 0;
                     parameter.item_details = user.keranjang.map((video) => {
@@ -133,7 +132,7 @@ function buy(req, res) {
                         };
                     });
                     return makePembayaran(parameter, {
-                        userID: res.locals.user.id,
+                        userID: res.locals.user.data.id,
                         paymentDetails: {
                             item_details: parameter.item_details,
                         },
