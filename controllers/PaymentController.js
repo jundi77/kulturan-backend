@@ -122,6 +122,7 @@ function buy(req, res) {
                     let totalPrice = 0;
                     parameter.item_details = user.keranjang.map((video) => {
                         totalPrice += video.price;
+                        console.log(totalPrice);
                         return {
                             id: video._id,
                             price: video.price,
@@ -132,6 +133,7 @@ function buy(req, res) {
                             merchant_name: video.pementas,
                         };
                     });
+                    console.log(totalPrice);
                     return makePembayaran(res, parameter, {
                         userID: res.locals.user.data.id,
                         paymentDetails: {
