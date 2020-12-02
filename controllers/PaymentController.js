@@ -105,7 +105,7 @@ function buy(req, res) {
                                 console.error(err);
                                 return res.status(400).json({
                                     status: 'failed',
-                                    msg: 'DB ERROR',
+                                    msg: 'DB ERROR for user',
                                 });
                             });
                         return makePembayaran(res, parameter, {
