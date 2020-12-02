@@ -70,7 +70,7 @@ apiRoute.userRoute(app);
 apiRoute.videoRoute(app);
 apiRoute.paymentGatewayRoute(app);
 app.use('/', (req, res) => {
-    return res.status(501).json({
+    return res.status(404).json({
         status: 'failed',
         msg: 'You get lost.',
     });
