@@ -259,7 +259,7 @@ function removeFromKeranjang(req, res) {
                 let index = user.keranjang.findIndex(
                     (videoID) => videoID == req.body.videoID
                 );
-                if (index) {
+                if (index > -1) {
                     user.keranjang.splice(index, 1);
                     user.save()
                         .then((user) => {
@@ -426,7 +426,7 @@ function removeFromFavorit(req, res) {
                 let index = user.favorit.findIndex(
                     (videoID) => videoID == req.body.videoID
                 );
-                if (index) {
+                if (index > -1) {
                     user.favorit.splice(index, 1);
                     --videoFound.favorit;
                     videoFound.save();

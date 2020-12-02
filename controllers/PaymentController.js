@@ -43,13 +43,13 @@ function makePembayaran(res, snapParameter, data) {
     });
 }
 
-function clearKeranjang(user, videoID = null) {
+function clearKeranjang(user, delVideoID = null) {
     if (user) {
-        if (videoID) {
+        if (delVideoID) {
             let index = user.keranjang.findIndex(
-                (videoID) => videoID == req.body.videoID
+                (videoID) => videoID == delVideoID
             );
-            if (index) {
+            if (index > -1) {
                 user.keranjang.splice(index, 1);
             }
         } else {
