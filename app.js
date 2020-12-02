@@ -37,8 +37,17 @@ global.kulturan.midtrans.snap = new midtransClient.Snap({
 app.use(cors());
 
 // parse body ke json
-app.use(express.json());
-
+try {
+    app.use(express.json());
+} catch (err) {
+    console.error(err);
+    app.use('/', (req, res) => {
+        return res.status(501).json({
+            status: 'failed',
+            msg: 'ERROR: NOT IMPLEMENTED FOR THIS REQUEST',
+        });
+    });
+}
 
 // connect ke mongoooooooooodb
 mongoose
@@ -61,5 +70,11 @@ apiRoute.authRoute(app);
 apiRoute.userRoute(app);
 apiRoute.videoRoute(app);
 apiRoute.paymentGatewayRoute(app);
+app.use('/', (req, res) => {
+    return res.status(501).json({
+        status: 'failed',
+        msg: 'You get lost.',
+    });
+});
 
 module.exports = app;
