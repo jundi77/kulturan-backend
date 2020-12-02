@@ -1,14 +1,10 @@
-function buy(req, res) {
-    // testing mode
-    let parameter = {
-        transaction_details: {
-            order_id: `test-transaction-${Date.now()}`,
-            gross_amount: 1000000,
-        },
-        creditCard: {
-            secure: true,
-        },
-    };
+const mongoose = require('mongoose');
+const User = require('../models/User');
+const Video = require('../models/Video');
+const Pembayaran = require('../models/Pembayaran');
+const e = require('express');
+
+function payWithSnap(parameter) {
     global.kulturan.midtrans.snap
         .createTransaction(parameter)
         .then((transaction) => {
@@ -23,11 +19,133 @@ function buy(req, res) {
         })
         .catch((err) => {
             console.error(err);
+            return res.status(503).json({
+                status: 'failed',
+                msg: 'Service payment sedang tidak tesedia',
+            });
+        });
+}
+
+function makePembayaran(snapParameter, data) {
+    let newPembayaran = new Pembayaran(data);
+    newPembayaran
+        .save((err) => {
+            console.error(err);
+            return res.status(400).json({
+                status: 'failed',
+                msg: 'DB ERROR',
+            });
+        })
+        .then((pay_detail) => {
+            snapParameter.transaction_details = {
+                order_id: pay_detail._id,
+                gross_amount: pay_detail.totalPrice,
+            };
+            return payWithSnap(snapParameter);
+        })
+        .catch((err) => {
+            console.error(err);
             return res.status(400).json({
                 status: 'failed',
                 msg: 'DB ERROR',
             });
         });
+}
+
+function buy(req, res) {
+    let parameter = {
+        customer_details: {
+            first_name: res.locals.user.name, // perlu perhatian batas karakter nantinya
+            email: res.locals.user.email,
+        },
+        credit_card: {
+            secure: true,
+        },
+        callbacks: {
+            finish: 'https://example.com', // diisi url callback kalau finish
+        },
+    };
+    if (req.body.hasOwnProperty('videoID')) {
+        if (mongoose.Types.ObjectId.isValid(req.body.videoID)) {
+            Video.findById(req.body.videoID)
+                .then((video) => {
+                    if (video) {
+                        parameter.item_details = [
+                            {
+                                id: video._id,
+                                price: video.price,
+                                quantity: 1,
+                                name: video.title,
+                                brand: video.pementas,
+                                category: 'video',
+                                merchant_name: video.pementas,
+                            },
+                        ];
+                        return makePembayaran(parameter, {
+                            userID: res.locals.user.id,
+                            paymentDetails: {
+                                item_details: parameter.item_details,
+                            },
+                            totalPrice: video.price,
+                        });
+                    } else {
+                        return res.status(400).json({
+                            status: 'failed',
+                            msg: {
+                                videoID: 'Video tidak ditemukan',
+                            },
+                        });
+                    }
+                })
+                .catch((err) => {
+                    console.error(err);
+                    return res.status(400).json({
+                        status: 'failed',
+                        msg: 'DB ERROR',
+                    });
+                });
+        } else {
+            return res.status(400).json({
+                status: 'failed',
+                msg: {
+                    videoID: 'ID video tidak valid',
+                },
+            });
+        }
+    } else {
+        // ambil dari keranjang
+        User.findById(res.locals.user.id)
+            .populate('videos')
+            .then((user) => {
+                if (user) {
+                    let totalPrice = 0;
+                    parameter.item_details = user.keranjang.map((video) => {
+                        totalPrice += video.price;
+                        return {
+                            id: video._id,
+                            price: video.price,
+                            quantity: 1,
+                            name: video.title,
+                            brand: video.pementas,
+                            category: 'video',
+                            merchant_name: video.pementas,
+                        };
+                    });
+                    return makePembayaran(parameter, {
+                        userID: res.locals.user.id,
+                        paymentDetails: {
+                            item_details: parameter.item_details,
+                        },
+                        totalPrice: totalPrice,
+                    });
+                } else {
+                    return res.status(400).json({
+                        status: 'failed',
+                        msg: 'User tidak ditemukan',
+                    });
+                }
+            });
+    }
 }
 function getStruct(req, res) {
     return res.status(400).json({
