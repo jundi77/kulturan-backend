@@ -256,7 +256,7 @@ function removeFromKeranjang(req, res) {
                 select: ['link.thumbnail', 'title', 'pementas', 'price'],
             })
             .then((user) => {
-                let index = keranjang.findIndex(
+                let index = user.keranjang.findIndex(
                     (videoID) => videoID == req.body.videoID
                 );
                 if (index) {
@@ -423,7 +423,7 @@ function removeFromFavorit(req, res) {
                 select: ['link.thumbnail', 'title', 'pementas', 'price'],
             })
             .then((user) => {
-                let index = favorit.findIndex(
+                let index = user.favorit.findIndex(
                     (videoID) => videoID == req.body.videoID
                 );
                 if (index) {

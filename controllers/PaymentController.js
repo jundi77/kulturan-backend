@@ -8,7 +8,6 @@ function payWithSnap(res, parameter) {
     global.kulturan.midtrans.snap
         .createTransaction(parameter)
         .then((transaction) => {
-            console.log(transaction);
             return res.status(200).json({
                 status: 'success',
                 data: {
@@ -36,13 +35,30 @@ function makePembayaran(res, snapParameter, data) {
                 msg: 'DB ERROR',
             });
         }
-        console.log(newPembayaran);
         snapParameter.transaction_details = {
             order_id: newPembayaran._id,
             gross_amount: newPembayaran.totalPrice,
         };
         return payWithSnap(res, snapParameter);
     });
+}
+
+function clearKeranjang(user, videoID = null) {
+    if (user) {
+        if (videoID) {
+            let index = user.keranjang.findIndex(
+                (videoID) => videoID == req.body.videoID
+            );
+            if (index) {
+                user.keranjang.splice(index, 1);
+            }
+        } else {
+            user.keranjang = [];
+        }
+        user.save((err) => {
+            console.error(err);
+        });
+    }
 }
 
 function buy(req, res) {
@@ -62,7 +78,6 @@ function buy(req, res) {
         if (mongoose.Types.ObjectId.isValid(req.body.videoID)) {
             Video.findById(req.body.videoID)
                 .then((video) => {
-                    console.log(video);
                     if (video) {
                         parameter.item_details = [
                             {
@@ -75,6 +90,24 @@ function buy(req, res) {
                                 merchant_name: video.pementas,
                             },
                         ];
+                        User.findById(res.locals.user.data.id)
+                            .then((user) => {
+                                if (user) {
+                                    clearKeranjang(user, video._id);
+                                } else {
+                                    return res.status(400).json({
+                                        status: 'failed',
+                                        msg: 'User tidak ditemukan',
+                                    });
+                                }
+                            })
+                            .catch((err) => {
+                                console.error(err);
+                                return res.status(400).json({
+                                    status: 'failed',
+                                    msg: 'DB ERROR',
+                                });
+                            });
                         return makePembayaran(res, parameter, {
                             userID: res.locals.user.data.id,
                             paymentDetails: {
@@ -117,13 +150,9 @@ function buy(req, res) {
             })
             .then((user) => {
                 if (user) {
-                    console.log(user.keranjang[0]);
                     let totalPrice = 0;
                     parameter.item_details = user.keranjang.map((video) => {
                         totalPrice += video.price;
-                        console.log(video.price);
-                        console.log(video.price instanceof Number);
-                        console.log(totalPrice);
                         return {
                             id: video._id,
                             price: video.price,
@@ -134,7 +163,7 @@ function buy(req, res) {
                             merchant_name: video.pementas,
                         };
                     });
-                    console.log(totalPrice);
+                    clearKeranjang(user);
                     return makePembayaran(res, parameter, {
                         userID: res.locals.user.data.id,
                         paymentDetails: {
