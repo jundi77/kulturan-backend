@@ -76,7 +76,7 @@ function buy(req, res) {
                             .then((user) => {
                                 if (user) {
                                     let index = user.keranjang.findIndex(
-                                        (videoID) => videoID == delVideoID
+                                        (videoID) => videoID == video._id
                                     );
                                     if (index > -1) {
                                         user.keranjang.splice(index, 1);
