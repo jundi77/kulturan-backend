@@ -171,42 +171,37 @@ function addToKeranjang(req, res) {
                         },
                     });
                 }
-            })
-            .catch((err) => {
-                return res.status(400).json({
-                    status: 'failed',
-                    msg: 'DB ERROR',
-                });
-            });
-        User.findOne({ _id: res.locals.user.data.id })
-            .populate({
-                path: 'keranjang',
-                model: 'videos',
-                select: ['link.thumbnail', 'title', 'pementas', 'price'],
-            })
-            .then((user) => {
-                if (
-                    !user.keranjang.find(
-                        (videoID) => videoID == req.body.videoID
-                    )
-                ) {
-                    user.keranjang.push(req.body.videoID);
-                    user.save()
-                        .then((user) => {
-                            return res.status(200).json({
+                User.findOne({ _id: res.locals.user.data.id })
+                    .then((user) => {
+                        if (
+                            !user.keranjang.find(
+                                (videoID) => videoID == req.body.videoID
+                            )
+                        ) {
+                            user.keranjang.push(req.body.videoID);
+                            user.save()
+                                .then((user) => {
+                                    return getKeranjang(req, res);
+                                })
+                                .catch((err) => {
+                                    return res.status(400).json({
+                                        status: 'failed',
+                                        msg: 'DB ERROR',
+                                    });
+                                });
+                        } else {
+                            res.status(200).json({
                                 status: 'success',
-                                data: {
-                                    keranjang: user.keranjang,
-                                },
+                                msg: 'Video sudah ada di keranjang',
                             });
-                        })
-                        .catch((err) => {
-                            return res.status(400).json({
-                                status: 'failed',
-                                msg: 'DB ERROR',
-                            });
+                        }
+                    })
+                    .catch((err) => {
+                        return res.status(400).json({
+                            status: 'failed',
+                            msg: 'DB ERROR',
                         });
-                }
+                    });
             })
             .catch((err) => {
                 return res.status(400).json({
@@ -242,41 +237,31 @@ function removeFromKeranjang(req, res) {
                         },
                     });
                 }
-            })
-            .catch((err) => {
-                return res.status(400).json({
-                    status: 'failed',
-                    msg: 'DB ERROR',
-                });
-            });
-        User.findOne({ _id: res.locals.user.data.id })
-            .populate({
-                path: 'keranjang',
-                model: 'videos',
-                select: ['link.thumbnail', 'title', 'pementas', 'price'],
-            })
-            .then((user) => {
-                let index = user.keranjang.findIndex(
-                    (videoID) => videoID == req.body.videoID
-                );
-                if (index > -1) {
-                    user.keranjang.splice(index, 1);
-                    user.save()
-                        .then((user) => {
-                            return res.status(200).json({
-                                status: 'success',
-                                data: {
-                                    keranjang: user.keranjang,
-                                },
-                            });
-                        })
-                        .catch((err) => {
-                            return res.status(400).json({
-                                status: 'failed',
-                                msg: 'DB ERROR',
-                            });
+                User.findOne({ _id: res.locals.user.data.id })
+                    .then((user) => {
+                        let index = user.keranjang.findIndex(
+                            (videoID) => videoID == req.body.videoID
+                        );
+                        if (index > -1) {
+                            user.keranjang.splice(index, 1);
+                            user.save()
+                                .then((user) => {
+                                    return getKeranjang(req, res);
+                                })
+                                .catch((err) => {
+                                    return res.status(400).json({
+                                        status: 'failed',
+                                        msg: 'DB ERROR',
+                                    });
+                                });
+                        }
+                    })
+                    .catch((err) => {
+                        return res.status(400).json({
+                            status: 'failed',
+                            msg: 'DB ERROR',
                         });
-                }
+                    });
             })
             .catch((err) => {
                 return res.status(400).json({
@@ -337,42 +322,39 @@ function addToFavorit(req, res) {
                     });
                 }
                 videoFound = video;
-            })
-            .catch((err) => {
-                return res.status(400).json({
-                    status: 'failed',
-                    msg: 'DB ERROR',
-                });
-            });
-        User.findOne({ _id: res.locals.user.data.id })
-            .populate({
-                path: 'favorit',
-                model: 'videos',
-                select: ['link.thumbnail', 'title', 'pementas', 'price'],
-            })
-            .then((user) => {
-                if (
-                    !user.favorit.find((videoID) => videoID == req.body.videoID)
-                ) {
-                    user.favorit.push(req.body.videoID);
-                    ++videoFound.favorit;
-                    videoFound.save();
-                    user.save()
-                        .then((user) => {
-                            return res.status(200).json({
+                User.findOne({ _id: res.locals.user.data.id })
+                    .then((user) => {
+                        if (
+                            !user.favorit.find(
+                                (videoID) => videoID == req.body.videoID
+                            )
+                        ) {
+                            user.favorit.push(req.body.videoID);
+                            ++videoFound.favorit;
+                            videoFound.save();
+                            user.save()
+                                .then((user) => {
+                                    return getFavorit(req, res);
+                                })
+                                .catch((err) => {
+                                    return res.status(400).json({
+                                        status: 'failed',
+                                        msg: 'DB ERROR',
+                                    });
+                                });
+                        } else {
+                            res.status(200).json({
                                 status: 'success',
-                                data: {
-                                    favorit: user.favorit,
-                                },
+                                msg: 'Video sudah ada di favorit',
                             });
-                        })
-                        .catch((err) => {
-                            return res.status(400).json({
-                                status: 'failed',
-                                msg: 'DB ERROR',
-                            });
+                        }
+                    })
+                    .catch((err) => {
+                        return res.status(400).json({
+                            status: 'failed',
+                            msg: 'DB ERROR',
                         });
-                }
+                    });
             })
             .catch((err) => {
                 return res.status(400).json({
@@ -409,43 +391,33 @@ function removeFromFavorit(req, res) {
                     });
                 }
                 videoFound = video;
-            })
-            .catch((err) => {
-                return res.status(400).json({
-                    status: 'failed',
-                    msg: 'DB ERROR',
-                });
-            });
-        User.findOne({ _id: res.locals.user.data.id })
-            .populate({
-                path: 'favorit',
-                model: 'videos',
-                select: ['link.thumbnail', 'title', 'pementas', 'price'],
-            })
-            .then((user) => {
-                let index = user.favorit.findIndex(
-                    (videoID) => videoID == req.body.videoID
-                );
-                if (index > -1) {
-                    user.favorit.splice(index, 1);
-                    --videoFound.favorit;
-                    videoFound.save();
-                    user.save()
-                        .then((user) => {
-                            return res.status(200).json({
-                                status: 'success',
-                                data: {
-                                    favorit: user.favorit,
-                                },
-                            });
-                        })
-                        .catch((err) => {
-                            return res.status(400).json({
-                                status: 'failed',
-                                msg: 'DB ERROR',
-                            });
+                User.findOne({ _id: res.locals.user.data.id })
+                    .then((user) => {
+                        let index = user.favorit.findIndex(
+                            (videoID) => videoID == req.body.videoID
+                        );
+                        if (index > -1) {
+                            user.favorit.splice(index, 1);
+                            --videoFound.favorit;
+                            videoFound.save();
+                            user.save()
+                                .then((user) => {
+                                    return getFavorit(req, res);
+                                })
+                                .catch((err) => {
+                                    return res.status(400).json({
+                                        status: 'failed',
+                                        msg: 'DB ERROR',
+                                    });
+                                });
+                        }
+                    })
+                    .catch((err) => {
+                        return res.status(400).json({
+                            status: 'failed',
+                            msg: 'DB ERROR',
                         });
-                }
+                    });
             })
             .catch((err) => {
                 return res.status(400).json({
