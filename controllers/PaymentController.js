@@ -2,7 +2,6 @@ const mongoose = require('mongoose');
 const User = require('../models/User');
 const Video = require('../models/Video');
 const Pembayaran = require('../models/Pembayaran');
-const e = require('express');
 
 function payWithSnap(res, parameter) {
     global.kulturan.midtrans.snap
@@ -79,29 +78,24 @@ function buy(req, res) {
                                 );
                                 if (index > -1) {
                                     user.keranjang.splice(index, 1);
-                                    user.save()
-                                        .then((user) => {
-                                            return makePembayaran(
-                                                res,
-                                                parameter,
-                                                {
-                                                    userID:
-                                                        res.locals.user.data.id,
-                                                    paymentDetails: {
-                                                        item_details:
-                                                            parameter.item_details,
-                                                    },
-                                                    totalPrice: video.price,
-                                                }
-                                            );
-                                        })
-                                        .catch((err) => {
-                                            return res.status(400).json({
-                                                status: 'failed',
-                                                msg: 'DB ERROR',
-                                            });
-                                        });
                                 }
+                                user.save()
+                                    .then((user) => {
+                                        return makePembayaran(res, parameter, {
+                                            userID: res.locals.user.data.id,
+                                            paymentDetails: {
+                                                item_details:
+                                                    parameter.item_details,
+                                            },
+                                            totalPrice: video.price,
+                                        });
+                                    })
+                                    .catch((err) => {
+                                        return res.status(400).json({
+                                            status: 'failed',
+                                            msg: 'DB ERROR',
+                                        });
+                                    });
                             })
                             .catch((err) => {
                                 return res.status(400).json({
@@ -179,12 +173,25 @@ function buy(req, res) {
             });
     }
 }
+
+function cancelPayment(req, res) {
+    return res.status(400).json({
+        status: 'failed',
+        msg: 'OND',
+    });
+
+    // https://api.sandbox.midtrans.com
+}
+
+// function scheduleRequest(req, res) scheduling
+
 function getStruct(req, res) {
     return res.status(400).json({
         status: 'failed',
         msg: 'OND',
     });
 }
+
 function midtransReceiver(req, res) {
     return res.status(200).json({
         status: 'success',
