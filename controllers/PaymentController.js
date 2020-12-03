@@ -271,8 +271,10 @@ function transactionStatusConvert(data) {
         case 'pending':
             if (data.fraudStatus === 'challenge') {
                 return `Transaksi diragukan, kontak admin untuk info lebih lanjut.`;
-            } else {
+            } else if (data.fraudStatus === 'accept') {
                 return `Menunggu anda membayar.`;
+            } else {
+                return 'Sedang diproses.';
             }
             break;
         case 'expire':
