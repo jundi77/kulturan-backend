@@ -74,10 +74,10 @@ function paymentGatewayRoute(app) {
         AuthTokenMiddleware(),
         PaymentController.cancelPayment
     );
-    router.use('/midtrans', MidtransOriginMiddleware());
+    router.use('/midtrans', MidtransOriginMiddleware({ log: true }));
     router.post(
         '/midtrans/payment-notification-receiver',
-        MidtransVerifyNotificationMiddleware(),
+        MidtransVerifyNotificationMiddleware({ log: true }),
         PaymentController.midtransPaymentNotificationReceiver
     );
 

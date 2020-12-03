@@ -387,7 +387,6 @@ function notifStatusPembayaran(data) {
 
 function midtransPaymentNotificationReceiver(req, res) {
     // konfirmasi kembali
-    let data = {};
     axios
         .get(
             `${process.env.MIDTRANS_BASE_URL}/v2/${req.body.transaction_id}/status`,
@@ -406,6 +405,7 @@ function midtransPaymentNotificationReceiver(req, res) {
                 let data = req.body;
                 Pembayaran.findById(data.order_id).then((pembayaran) => {
                     if (pembayaran) {
+                        console.log(pembayaran);
                         if (
                             pembayaran.paymentDetails.hasOwnProperty(
                                 'transactionID'
@@ -459,6 +459,12 @@ function midtransPaymentNotificationReceiver(req, res) {
                             return res.status(200).json({
                                 status: 'success',
                             });
+                        });
+                    } else {
+                        console.log('pembayaran ga ada');
+                        return res.status(404).json({
+                            status: 'failed',
+                            msg: "Huh? Nothing's here",
                         });
                     }
                 });
