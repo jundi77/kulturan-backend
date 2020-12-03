@@ -194,7 +194,7 @@ function buy(req, res) {
 function cancelPayment(req, res) {
     axios
         .post(
-            `${process.env.MIDTRANS_BASE_URL}/v2/${req.body.transaction_id}/cancel`,
+            `${process.env.MIDTRANS_BASE_URL}/v2/${req.params.paymentid}/cancel`,
             {},
             {
                 headers: {
@@ -223,7 +223,7 @@ function cancelPayment(req, res) {
             console.error(err);
             return res.status(200).json({
                 status: 'failed',
-                msg: 'Ada masalah dengan sistem kami',
+                msg: 'Ada masalah dengan sistem kami, coba beberapa saat lagi',
             });
         });
 }
