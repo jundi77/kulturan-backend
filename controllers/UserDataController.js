@@ -205,7 +205,7 @@ function addToKeranjang(req, res) {
                                         });
                                     });
                             } else {
-                                res.status(200).json({
+                                return res.status(200).json({
                                     status: 'success',
                                     msg: 'Video sudah ada di keranjang',
                                 });
@@ -359,7 +359,7 @@ function addToFavorit(req, res) {
                                     });
                                 });
                         } else {
-                            res.status(200).json({
+                            return res.status(200).json({
                                 status: 'success',
                                 msg: 'Video sudah ada di favorit',
                             });
