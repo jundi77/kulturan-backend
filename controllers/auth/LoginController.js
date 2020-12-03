@@ -63,7 +63,7 @@ const LoginController = (req, res) => {
         })
         .catch((err) => {
             console.error(err);
-            return res.status(400).json({
+            return res.status(500).json({
                 status: 'failed',
                 msg: 'DB ERROR',
             });

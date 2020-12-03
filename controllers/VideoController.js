@@ -16,7 +16,7 @@ function getAll(req, res) {
         })
         .catch((err) => {
             console.error(err);
-            return res.status(400).json({
+            return res.status(500).json({
                 status: 'failed',
                 msg: 'DB ERROR',
             });
@@ -50,14 +50,14 @@ function getFromID(req, res) {
                     },
                 });
             }
-            return res.status(400).json({
+            return res.status(404).json({
                 status: 'failed',
                 msg: 'Video tidak ditemukan',
             });
         })
         .catch((err) => {
             console.error(err);
-            return res.status(400).json({
+            return res.status(500).json({
                 status: 'failed',
                 msg: 'DB ERROR',
             });
