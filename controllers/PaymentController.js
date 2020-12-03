@@ -7,6 +7,13 @@ const axios = require('axios');
 function makePembayaran(res, snapParameter, data, user, videoID = null) {
     let pembayaran = new Pembayaran(data);
     pembayaran.save((err) => {
+        if (err) {
+            console.error(err);
+            return res.status(500).json({
+                status: 'failed',
+                msg: 'DB ERROR',
+            });
+        }
         snapParameter.transaction_details = {
             order_id: pembayaran._id,
             gross_amount: pembayaran.totalPrice,
