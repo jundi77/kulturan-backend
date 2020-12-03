@@ -230,7 +230,7 @@ function cancelPayment(req, res) {
 
 // function scheduleRequest(req, res) scheduling
 
-function getStruct(req, res) {
+function getStructs(req, res) {
     Pembayaran.find({ userID: res.locals.user.data.id })
         .select('totalPrice paid paymentDetails')
         .then((structs) => {
@@ -244,6 +244,30 @@ function getStruct(req, res) {
                 status: 'success',
                 data: {
                     structs,
+                },
+            });
+        })
+        .catch((err) => {
+            return res.status(500).json({
+                status: 'failed',
+                msg: 'DB ERROR',
+            });
+        });
+}
+
+function getOneStruct(req, res) {
+    let paymentID = req.params.paymentid;
+    Pembayaran.findById(paymentID)
+        .select('totalPrice paid paymentDetails')
+        .then((struct) => {
+            if (struct.paymentDetails.hasOwnProperty('transactionToken')) {
+                struct.paymentDetails.links = {};
+                struct.paymentDetails.links.instruction = `${process.env.MIDTRANS_BASE_URL}/snap/v1/transactions/${struct.paymentDetails.transactionToken}/pdf`;
+            }
+            return res.status(200).json({
+                status: 'success',
+                data: {
+                    struct,
                 },
             });
         })
@@ -449,7 +473,8 @@ function midtransPaymentNotificationReceiver(req, res) {
 
 module.exports = {
     buy,
-    getStruct,
+    getStructs,
+    getOneStruct,
     cancelPayment,
     midtransPaymentNotificationReceiver,
 };
