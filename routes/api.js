@@ -63,8 +63,17 @@ function paymentGatewayRoute(app) {
     let router = express.Router();
 
     router.post('/buy', AuthTokenMiddleware(), PaymentController.buy);
-    router.get('/struct', AuthTokenMiddleware(), PaymentController.getStruct);
-
+    router.get('/structs', AuthTokenMiddleware(), PaymentController.getStructs);
+    router.get(
+        '/structs/:paymentid',
+        AuthTokenMiddleware(),
+        PaymentController.getOneStruct
+    );
+    router.get(
+        '/structs/:paymentid/cancel',
+        AuthTokenMiddleware(),
+        PaymentController.cancelPayment
+    );
     router.use('/midtrans', MidtransOriginMiddleware());
     router.post(
         '/midtrans/payment-notification-receiver',
