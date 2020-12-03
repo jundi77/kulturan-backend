@@ -372,8 +372,9 @@ function midtransPaymentNotificationReceiver(req, res) {
                                 data.payment_type;
                             pembayaran.paymentDetails.transaction_status =
                                 data.transaction_status;
-                            pembayaran.paymentDetails.transaction_time =
-                                data.transaction_time;
+                            pembayaran.paymentDetails.transaction_time = new Date(
+                                data.transaction_time
+                            );
                             pembayaran.paymentDetails.merchant_id =
                                 data.merchant_id;
                             pembayaran.paymentDetails.fraud_status =
