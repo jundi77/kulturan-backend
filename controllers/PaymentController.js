@@ -250,19 +250,22 @@ function getStructs(req, res) {
             select: ['link.thumbnail', 'title', 'pementas', 'price'],
         })
         .then((structs) => {
-            structs = structs.map((struct) => {
-                if (struct.paymentDetails.hasOwnProperty('transactionToken')) {
-                    struct.link = {};
-                    struct.link.instruction = `${process.env.MIDTRANS_BASE_URL}/snap/v1/transactions/${struct.paymentDetails.transactionToken}/pdf`;
-                }
-                delete struct.paymentDetails;
-                console.log(structs);
-                return struct;
-            });
+            console.log(structs);
             return res.status(200).json({
                 status: 'success',
                 data: {
-                    structs,
+                    structs: structs.map((struct) => {
+                        if (
+                            struct.paymentDetails.hasOwnProperty(
+                                'transactionToken'
+                            )
+                        ) {
+                            struct.link = {};
+                            struct.link.instruction = `${process.env.MIDTRANS_BASE_URL}/snap/v1/transactions/${struct.paymentDetails.transactionToken}/pdf`;
+                        }
+                        delete struct['paymentDetails'];
+                        return struct;
+                    }),
                 },
             });
         })
