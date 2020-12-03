@@ -259,46 +259,44 @@ function cancelPayment(req, res) {
 // function scheduleRequest(req, res) scheduling
 
 function transactionStatusConvert(data) {
-    let converted = '';
     switch (data.transactionStatus) {
         case 'capture':
         case 'settlement':
             if (data.fraudStatus === 'accept') {
-                converted = `Transaksi berhasil.`;
+                return `Transaksi berhasil.`;
             } else if (data.fraudStatus === 'challenge') {
-                converted = `Transaksi telah diverifikasi dan berhasil.`;
+                return `Transaksi telah diverifikasi dan berhasil.`;
             }
             break;
         case 'pending':
             if (data.fraudStatus === 'challenge') {
-                converted = `Transaksi diragukan, kontak admin untuk info lebih lanjut.`;
+                return `Transaksi diragukan, kontak admin untuk info lebih lanjut.`;
             } else {
-                converted = `Menunggu anda membayar.`;
+                return `Menunggu anda membayar.`;
             }
             break;
         case 'expire':
-            converted = `Transaksi kadaluarsa.`;
+            return `Transaksi kadaluarsa.`;
             break;
         case 'refund':
-            converted = `Dana dari transaksi telah dikembalikan.`;
+            return `Dana dari transaksi telah dikembalikan.`;
             break;
         case 'partial_refund':
-            converted = `Dana dari transaksi dikembalikan sejumlah {test}.`;
+            return `Dana dari transaksi dikembalikan sejumlah {test}.`;
             break;
         case 'deny':
             if (data.fraudStatus === 'deny') {
-                converted = `Transaksi ditolak karena diragukan kebenarannya.`;
+                return `Transaksi ditolak karena diragukan kebenarannya.`;
             } else {
-                converted = `Transaksi ditolak.`;
+                return `Transaksi ditolak.`;
             }
             break;
         case 'cancel':
-            converted = `Transaksi dibatalkan.`;
+            return `Transaksi dibatalkan.`;
             break;
         default:
             break;
     }
-    return converted;
 }
 
 function getStructs(req, res) {
