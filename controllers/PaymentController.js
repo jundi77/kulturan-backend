@@ -258,14 +258,51 @@ function cancelPayment(req, res) {
 
 // function scheduleRequest(req, res) scheduling
 
+function transactionStatusConvert(data) {
+    let converted = '';
+    switch (data.transactionStatus) {
+        case 'capture':
+        case 'settlement':
+            if (data.fraudStatus === 'accept') {
+                converted = `Transaksi berhasil.`;
+            } else if (data.fraudStatus === 'challenge') {
+                converted = `Transaksi telah diverifikasi dan berhasil.`;
+            }
+            break;
+        case 'pending':
+            if (data.fraudStatus === 'challenge') {
+                converted = `Transaksi diragukan, kontak admin untuk info lebih lanjut.`;
+            } else {
+                converted = `Menunggu anda membayar.`;
+            }
+            break;
+        case 'expire':
+            converted = `Transaksi kadaluarsa.`;
+            break;
+        case 'refund':
+            converted = `Dana dari transaksi telah dikembalikan.`;
+            break;
+        case 'partial_refund':
+            converted = `Dana dari transaksi dikembalikan sejumlah {test}.`;
+            break;
+        case 'deny':
+            if (data.fraudStatus === 'deny') {
+                converted = `Transaksi ditolak karena diragukan kebenarannya.`;
+            } else {
+                converted = `Transaksi ditolak.`;
+            }
+            break;
+        case 'cancel':
+            converted = `Transaksi dibatalkan.`;
+            break;
+        default:
+            break;
+    }
+}
+
 function getStructs(req, res) {
     Pembayaran.find({ userID: res.locals.user.data.id })
-        .select('totalPrice paid itemDetails paymentDetails')
-        .populate({
-            path: 'itemDetails',
-            model: 'videos',
-            select: ['link.thumbnail', 'title', 'pementas', 'price'],
-        })
+        .select('totalPrice paid paymentDetails')
         .then((structs) => {
             console.log(structs);
             return res.status(200).json({
@@ -278,10 +315,19 @@ function getStructs(req, res) {
                                 'transactionToken'
                             )
                         ) {
-                            struct.link = {};
-                            struct.link.instruction = `https://app.sandbox.midtrans.com/snap/v1/transactions/${struct.paymentDetails.transactionToken}/pdf`;
+                            // cek kalau sudah kadaluarsa
+                            let now = new Date();
+                            if (
+                                now <
+                                struct.paymentDetails.transactionTokenExpire
+                            ) {
+                                struct.transactionToken =
+                                    struct.paymentDetails.transactionToken;
+                            }
                         }
-                        struct.status = struct.paymentDetails.transactionStatus;
+                        struct.status = transactionStatusConvert(
+                            struct.paymentDetails
+                        );
                         delete struct['paymentDetails'];
                         return struct;
                     }),
@@ -309,10 +355,14 @@ function getOneStruct(req, res) {
         .then((struct) => {
             struct = struct.toObject();
             if (struct.paymentDetails.hasOwnProperty('transactionToken')) {
-                struct.link = {};
-                struct.link.instruction = `https://app.sandbox.midtrans.com/snap/v1/transactions/${struct.paymentDetails.transactionToken}/pdf`;
+                // cek kalau sudah kadaluarsa
+                let now = new Date();
+                if (now < struct.paymentDetails.transactionTokenExpire) {
+                    struct.transactionToken =
+                        struct.paymentDetails.transactionToken;
+                }
             }
-            struct.status = struct.paymentDetails.transactionStatus;
+            struct.status = transactionStatusConvert(struct.paymentDetails);
             delete struct['paymentDetails'];
             return res.status(200).json({
                 status: 'success',
@@ -329,7 +379,7 @@ function getOneStruct(req, res) {
         });
 }
 
-function notifStatusPembayaran(data) {
+function notifStatusPembayaranDiscord(data) {
     let content = '';
     switch (data.transaction_status) {
         case 'capture':
@@ -511,7 +561,7 @@ function midtransPaymentNotificationReceiver(req, res) {
                                         msg: 'DB ERROR',
                                     });
                                 }
-                                notifStatusPembayaran(req.body);
+                                notifStatusPembayaranDiscord(req.body);
                                 return res.status(200).json({
                                     status: 'success',
                                 });
