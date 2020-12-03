@@ -20,10 +20,6 @@ const PaymentSchema = new Schema(
             type: Number,
             required: true,
         },
-        struct: {
-            type: Object,
-            default: {},
-        },
     },
     { timestamps: true }
 );
