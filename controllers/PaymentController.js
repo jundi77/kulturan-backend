@@ -414,80 +414,92 @@ function midtransPaymentNotificationReceiver(req, res) {
         .then((response) => {
             if (response.data.order_id === req.body.order_id) {
                 let data = req.body;
-                Pembayaran.findById(data.order_id).then((pembayaran) => {
-                    if (pembayaran) {
-                        console.log(pembayaran);
-                        if (
-                            pembayaran.paymentDetails.hasOwnProperty(
-                                'transactionID'
-                            ) &&
-                            pembayaran.paymentDetails.transactionID ===
-                                data.transaction_id
-                        ) {
-                            if (data.fraud_status === 'accept') {
-                                switch (data.transaction_status) {
-                                    case 'capture':
-                                    case 'settlement':
-                                        pembayaran.paid = true;
-                                        break;
-                                    default:
-                                        break;
-                                }
-                                if (data.transaction_status != 'pending') {
-                                    if (data.paymentDetails.transactionToken) {
-                                        delete data.paymentDetails
-                                            .transactionToken;
+                Pembayaran.findById(data.order_id)
+                    .then((pembayaran) => {
+                        if (pembayaran) {
+                            console.log(pembayaran);
+                            if (
+                                pembayaran.paymentDetails.hasOwnProperty(
+                                    'transactionID'
+                                ) &&
+                                pembayaran.paymentDetails.transactionID ===
+                                    data.transaction_id
+                            ) {
+                                if (data.fraud_status === 'accept') {
+                                    switch (data.transaction_status) {
+                                        case 'capture':
+                                        case 'settlement':
+                                            pembayaran.paid = true;
+                                            break;
+                                        default:
+                                            break;
                                     }
-                                    if (data.paymentDetails.links.instruksi) {
-                                        delete data.paymentDetails.links
-                                            .instruksi;
+                                    if (data.transaction_status != 'pending') {
+                                        if (
+                                            data.paymentDetails.transactionToken
+                                        ) {
+                                            delete data.paymentDetails
+                                                .transactionToken;
+                                        }
+                                        if (
+                                            data.paymentDetails.links.instruksi
+                                        ) {
+                                            delete data.paymentDetails.links
+                                                .instruksi;
+                                        }
                                     }
+                                    pembayaran.paymentDetails.transactionStatus =
+                                        data.transaction_status;
+                                    pembayaran.paymentDetails.fraudStatus =
+                                        data.fraud_status;
                                 }
+                            } else {
+                                pembayaran.paymentDetails.transactionID =
+                                    data.transaction_id;
+                                pembayaran.paymentDetails.paymentType =
+                                    data.payment_type;
                                 pembayaran.paymentDetails.transactionStatus =
                                     data.transaction_status;
+                                pembayaran.paymentDetails.transactionTime = new Date(
+                                    data.transaction_time
+                                );
+                                pembayaran.paymentDetails.merchantID =
+                                    data.merchant_id;
                                 pembayaran.paymentDetails.fraudStatus =
                                     data.fraud_status;
                             }
-                        } else {
-                            pembayaran.paymentDetails.transactionID =
-                                data.transaction_id;
-                            pembayaran.paymentDetails.paymentType =
-                                data.payment_type;
-                            pembayaran.paymentDetails.transactionStatus =
-                                data.transaction_status;
-                            pembayaran.paymentDetails.transactionTime = new Date(
-                                data.transaction_time
-                            );
-                            pembayaran.paymentDetails.merchantID =
-                                data.merchant_id;
-                            pembayaran.paymentDetails.fraudStatus =
-                                data.fraud_status;
-                        }
-                        pembayaran.markModified('paymentDetails');
-                        pembayaran.save((err) => {
-                            console.log(pembayaran);
-                            if (err) {
-                                return res.status(500).json({
-                                    status: 'failed',
-                                    msg: 'DB ERROR',
+                            pembayaran.markModified('paymentDetails');
+                            pembayaran.save((err) => {
+                                console.log(pembayaran);
+                                if (err) {
+                                    return res.status(500).json({
+                                        status: 'failed',
+                                        msg: 'DB ERROR',
+                                    });
+                                }
+                                notifStatusPembayaran(req.body);
+                                return res.status(200).json({
+                                    status: 'success',
                                 });
-                            }
-                            notifStatusPembayaran(req.body);
-                            return res.status(200).json({
-                                status: 'success',
                             });
-                        });
-                    } else {
-                        console.log('pembayaran ga ada');
-                        return res.status(404).json({
+                        } else {
+                            console.log('pembayaran ga ada');
+                            return res.status(404).json({
+                                status: 'failed',
+                                msg: "Huh? Nothing's here",
+                            });
+                        }
+                    })
+                    .catch((err) => {
+                        console.error(err);
+                        return res.status(500).json({
                             status: 'failed',
-                            msg: "Huh? Nothing's here",
                         });
-                    }
-                });
+                    });
             }
         })
         .catch((err) => {
+            console.error(err);
             return res.status(500).json({
                 status: 'failed',
             });
