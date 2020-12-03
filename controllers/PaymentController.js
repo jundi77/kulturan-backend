@@ -21,6 +21,7 @@ function payWithSnap(res, parameter, pembayaran) {
                         msg: 'Warning: token not saved',
                     });
                 }
+                console.log(pembayaran);
                 console.log(pembayaran.paymentDetails);
                 return res.status(200).json({
                     status: 'success',
