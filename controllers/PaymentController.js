@@ -4,33 +4,40 @@ const Video = require('../models/Video');
 const Pembayaran = require('../models/Pembayaran');
 const axios = require('axios');
 
-function payWithSnap(res, parameter, pembayaran) {
+function payWithSnap(res, parameter, id_pembayaran) {
     global.kulturan.midtrans.snap
         .createTransaction(parameter)
         .then((transaction) => {
-            pembayaran.paymentDetails.transaction_token = transaction.token;
-            pembayaran.paymentDetails.save((err) => {
-                if (err) {
-                    console.error(err);
+            Pembayaran.findOneAndUpdate(
+                { _id: id_pembayaran },
+                {
+                    $set: {
+                        'paymentDetails.transaction_token': transaction.token,
+                    },
+                },
+                (err, pembayaran) => {
+                    if (err) {
+                        console.error(err);
+                        return res.status(200).json({
+                            status: 'success',
+                            data: {
+                                transactionToken: transaction.token,
+                                redirectURL: transaction.redirect_url,
+                            },
+                            msg: 'Warning: token not saved',
+                        });
+                    }
+                    console.log(pembayaran);
+                    console.log(pembayaran.paymentDetails);
                     return res.status(200).json({
                         status: 'success',
                         data: {
                             transactionToken: transaction.token,
                             redirectURL: transaction.redirect_url,
                         },
-                        msg: 'Warning: token not saved',
                     });
                 }
-                console.log(pembayaran);
-                console.log(pembayaran.paymentDetails);
-                return res.status(200).json({
-                    status: 'success',
-                    data: {
-                        transactionToken: transaction.token,
-                        redirectURL: transaction.redirect_url,
-                    },
-                });
-            });
+            );
         })
         .catch((err) => {
             console.error(err);
