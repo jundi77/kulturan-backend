@@ -250,6 +250,7 @@ function getStructs(req, res) {
                     struct.paymentDetails.links = {};
                     struct.paymentDetails.links.instruction = `${process.env.MIDTRANS_BASE_URL}/snap/v1/transactions/${struct.paymentDetails.transactionToken}/pdf`;
                 }
+                return struct;
             });
             return res.status(200).json({
                 status: 'success',
