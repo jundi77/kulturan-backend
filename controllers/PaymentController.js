@@ -192,12 +192,40 @@ function buy(req, res) {
 }
 
 function cancelPayment(req, res) {
-    return res.status(503).json({
-        status: 'failed',
-        msg: 'OND',
-    });
-
-    // https://api.sandbox.midtrans.com
+    axios
+        .post(
+            `${process.env.MIDTRANS_BASE_URL}/v2/${req.body.transaction_id}/cancel`,
+            {},
+            {
+                headers: {
+                    'Content-Type': 'application/json',
+                    accept: 'application/json',
+                    Authorization: `Basic ${Buffer.from(
+                        process.env.MIDTRANS_SERVER_KEY + ':'
+                    ).toString('base64')}`,
+                },
+            }
+        )
+        .then((response) => {
+            response = response.data;
+            if (response.status_code == 200) {
+                return res.status(200).json({
+                    status: 'success',
+                });
+            } else {
+                return res.status(200).json({
+                    status: 'failed',
+                    msg: 'Coba lagi setelah beberapa menit',
+                });
+            }
+        })
+        .catch((err) => {
+            console.error(err);
+            return res.status(200).json({
+                status: 'failed',
+                msg: 'Ada masalah dengan sistem kami',
+            });
+        });
 }
 
 // function scheduleRequest(req, res) scheduling
