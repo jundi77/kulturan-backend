@@ -379,9 +379,10 @@ function midtransPaymentNotificationReceiver(req, res) {
                             pembayaran.paymentDetails.fraud_status =
                                 data.fraud_status;
                             pembayaran.paymentDetails.link = {
-                                instruksi: `${process.env.MIDTRANS_BASE_URL}/snap/v1/transactions/${pembayaran.transactionToken}/pdf`,
+                                instruksi: `${process.env.MIDTRANS_BASE_URL}/snap/v1/transactions/${pembayaran.paymentDetails.transactionToken}/pdf`,
                             };
                         }
+                        pembayaran.markModified('paymentDetails');
                         pembayaran.save((err) => {
                             console.log(pembayaran);
                             if (err) {
