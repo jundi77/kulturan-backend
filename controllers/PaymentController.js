@@ -255,6 +255,7 @@ function getStructs(req, res) {
                 status: 'success',
                 data: {
                     structs: structs.map((struct) => {
+                        struct = struct.toObject();
                         if (
                             struct.paymentDetails.hasOwnProperty(
                                 'transactionToken'
