@@ -244,17 +244,17 @@ function removeFromKeranjang(req, res) {
                         );
                         if (index > -1) {
                             user.keranjang.splice(index, 1);
-                            user.save()
-                                .then((user) => {
-                                    return getKeranjang(req, res);
-                                })
-                                .catch((err) => {
-                                    return res.status(400).json({
-                                        status: 'failed',
-                                        msg: 'DB ERROR',
-                                    });
-                                });
                         }
+                        user.save()
+                            .then((user) => {
+                                return getKeranjang(req, res);
+                            })
+                            .catch((err) => {
+                                return res.status(400).json({
+                                    status: 'failed',
+                                    msg: 'DB ERROR',
+                                });
+                            });
                     })
                     .catch((err) => {
                         return res.status(400).json({
@@ -400,17 +400,17 @@ function removeFromFavorit(req, res) {
                             user.favorit.splice(index, 1);
                             --videoFound.favorit;
                             videoFound.save();
-                            user.save()
-                                .then((user) => {
-                                    return getFavorit(req, res);
-                                })
-                                .catch((err) => {
-                                    return res.status(400).json({
-                                        status: 'failed',
-                                        msg: 'DB ERROR',
-                                    });
-                                });
                         }
+                        user.save()
+                            .then((user) => {
+                                return getFavorit(req, res);
+                            })
+                            .catch((err) => {
+                                return res.status(400).json({
+                                    status: 'failed',
+                                    msg: 'DB ERROR',
+                                });
+                            });
                     })
                     .catch((err) => {
                         return res.status(400).json({
