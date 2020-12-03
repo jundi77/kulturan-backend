@@ -297,6 +297,7 @@ function transactionStatusConvert(data) {
             return `Transaksi dibatalkan.`;
             break;
         default:
+            return 'Transaksi belum ditentukan.';
             break;
     }
 }
