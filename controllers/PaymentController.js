@@ -242,8 +242,8 @@ function cancelPayment(req, res) {
                 });
             } else {
                 return res.status(200).json({
-                    status: 'failed',
-                    msg: 'Coba lagi setelah beberapa menit',
+                    status: 'success',
+                    msg: 'Sedang diproses',
                 });
             }
         })
@@ -251,7 +251,8 @@ function cancelPayment(req, res) {
             console.error(err);
             return res.status(200).json({
                 status: 'failed',
-                msg: 'Ada masalah dengan sistem kami, coba beberapa saat lagi',
+                msg:
+                    'Sedang diproses, jika tidak kunjung batal, coba lagi dalam 1 jam atau hubungi admin',
             });
         });
 }

@@ -6,7 +6,7 @@ const Kategori = require('../models/Kategori');
 function getAll(req, res) {
     Video.find({})
         .populate('categories')
-        .select(['link.thumbnail', 'title', 'pementas', 'price'])
+        .select(['link.thumbnail', 'title', 'pementas', 'price', 'categories'])
         .then((videos) => {
             return res.status(200).json({
                 status: 'success',
