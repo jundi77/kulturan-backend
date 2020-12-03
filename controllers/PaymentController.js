@@ -88,7 +88,7 @@ function buy(req, res) {
             secure: true,
         },
         expiry: {
-            start_time: datejs(date).format('YYYY-MM-DD HH:mm:ss Z'),
+            start_time: dayjs(date).format('YYYY-MM-DD HH:mm:ss Z'),
             unit: 'hour',
             duration: 12,
         },
