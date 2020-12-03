@@ -219,97 +219,97 @@ function notifStatusPembayaran(data) {
         case 'capture':
         case 'settlement':
             if (data.fraud_status === 'accept') {
-                content = `Transaksi ${
+                content = `Transaksi \`${
                     data.order_id
-                } sebesar \`${Intl.NumberFormat('id', {
+                }\` sebesar \`\`${Intl.NumberFormat('id', {
                     style: 'currency',
                     currency: 'IDR',
                 }).format(data.gross_amount)}\` berhasil diterima.`;
             } else if (data.fraud_status === 'challenge') {
-                content = `Transaksi ${
+                content = `Transaksi \`${
                     data.order_id
-                } sebesar \`${Intl.NumberFormat('id', {
+                }\` sebesar \`\`${Intl.NumberFormat('id', {
                     style: 'currency',
                     currency: 'IDR',
-                }).format(100000)}\` telah diverifikasi dan berhasil.`;
+                }).format(
+                    data.gross_amount
+                )}\` telah diverifikasi dan berhasil.`;
             }
             break;
         case 'pending':
             if (data.fraud_status === 'challenge') {
-                content = `Transaksi ${
+                content = `Transaksi \`${
                     data.order_id
-                } sebesar \`${Intl.NumberFormat('id', {
+                }\` sebesar \`\`${Intl.NumberFormat('id', {
                     style: 'currency',
                     currency: 'IDR',
                 }).format(
-                    100000
+                    data.gross_amount
                 )}\` diragukan, kontak admin untuk info lebih lanjut.`;
             } else {
-                content = `Transaksi baru ${
+                content = `Transaksi baru \`${
                     data.order_id
-                } sebesar \`${Intl.NumberFormat('id', {
+                }\` sebesar \`\`${Intl.NumberFormat('id', {
                     style: 'currency',
                     currency: 'IDR',
-                }).format(100000)}\`.`;
+                }).format(data.gross_amount)}\`.`;
             }
             break;
         case 'expire':
-            content = `Transaksi ${data.order_id} sebesar \`${Intl.NumberFormat(
-                'id',
-                {
-                    style: 'currency',
-                    currency: 'IDR',
-                }
-            ).format(data.gross_amount)}\` kadaluarsa.`;
+            content = `Transaksi \`${
+                data.order_id
+            }\` sebesar \`\`${Intl.NumberFormat('id', {
+                style: 'currency',
+                currency: 'IDR',
+            }).format(data.gross_amount)}\` kadaluarsa.`;
             break;
         case 'refund':
-            content = `Dana dari transaksi ${
+            content = `Dana dari transaksi \`${
                 data.order_id
-            } sebesar \`${Intl.NumberFormat('id', {
+            }\` sebesar \`\`${Intl.NumberFormat('id', {
                 style: 'currency',
                 currency: 'IDR',
             }).format(data.gross_amount)}\` telah dikembalikan.`;
             break;
         case 'partial_refund':
-            content = `Dana dari transaksi ${
+            content = `Dana dari transaksi \`${
                 data.order_id
-            } sebesar \`${Intl.NumberFormat('id', {
+            }\` sebesar \`\`${Intl.NumberFormat('id', {
                 style: 'currency',
                 currency: 'IDR',
             }).format(
                 data.gross_amount
-            )}\` dikembalikan sejumlah \`${Intl.NumberFormat('id', {
+            )}\` dikembalikan sejumlah \`\`${Intl.NumberFormat('id', {
                 style: 'currency',
                 currency: 'IDR',
             }).format(data.refund_amount)}\`.`;
             break;
         case 'deny':
             if (data.fraud_status === 'deny') {
-                content = `Transaksi ${
+                content = `Transaksi \`${
                     data.order_id
-                } sebesar \`${Intl.NumberFormat('id', {
+                }\` sebesar \`\`${Intl.NumberFormat('id', {
                     style: 'currency',
                     currency: 'IDR',
                 }).format(
                     data.gross_amount
                 )}\` ditolak karena diragukan kebenarannya.`;
             } else {
-                content = `Transaksi ${
+                content = `Transaksi \`${
                     data.order_id
-                } sebesar \`${Intl.NumberFormat('id', {
+                }\` sebesar \`\`${Intl.NumberFormat('id', {
                     style: 'currency',
                     currency: 'IDR',
                 }).format(data.gross_amount)}\` ditolak.`;
             }
             break;
         case 'cancel':
-            content = `Transaksi ${data.order_id} sebesar \`${Intl.NumberFormat(
-                'id',
-                {
-                    style: 'currency',
-                    currency: 'IDR',
-                }
-            ).format(data.gross_amount)}\` dibatalkan.`;
+            content = `Transaksi \`${
+                data.order_id
+            }\` sebesar \`\`${Intl.NumberFormat('id', {
+                style: 'currency',
+                currency: 'IDR',
+            }).format(data.gross_amount)}\` dibatalkan.`;
             break;
         default:
             break;
@@ -379,7 +379,7 @@ function midtransPaymentNotificationReceiver(req, res) {
                             pembayaran.paymentDetails.fraud_status =
                                 data.fraud_status;
                             pembayaran.paymentDetails.link = {
-                                instruksi: `https =//app.sandbox.midtrans.com/snap/v1/transactions/${pembayaran.transactionToken}/pdf`,
+                                instruksi: `${process.env.MIDTRANS_BASE_URL}/snap/v1/transactions/${pembayaran.transactionToken}/pdf`,
                             };
                         }
                         pembayaran.save((err) => {
