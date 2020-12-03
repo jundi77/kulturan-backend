@@ -434,8 +434,14 @@ function midtransPaymentNotificationReceiver(req, res) {
                                         break;
                                 }
                                 if (data.transaction_status != 'pending') {
-                                    delete data.paymentDetails.transactionToken;
-                                    delete data.paymentDetails.links.instruksi;
+                                    if (data.paymentDetails.transactionToken) {
+                                        delete data.paymentDetails
+                                            .transactionToken;
+                                    }
+                                    if (data.paymentDetails.links.instruksi) {
+                                        delete data.paymentDetails.links
+                                            .instruksi;
+                                    }
                                 }
                                 pembayaran.paymentDetails.transactionStatus =
                                     data.transaction_status;
