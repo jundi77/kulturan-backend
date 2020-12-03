@@ -182,7 +182,7 @@ function addToKeranjang(req, res) {
                             status: 'success',
                             msg: 'Video sudah dibeli',
                             data: {
-                                transactionID: paid[0]._id,
+                                transactionID: paid._id,
                             },
                         });
                     }
