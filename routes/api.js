@@ -69,7 +69,7 @@ function paymentGatewayRoute(app) {
     router.post(
         '/midtrans/payment-notification-receiver',
         MidtransVerifyNotificationMiddleware({ log: true }),
-        PaymentController.midtransReceiver
+        PaymentController.midtransPaymentNotificationReceiver
     );
 
     app.use('/payment', router);

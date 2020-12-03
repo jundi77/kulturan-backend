@@ -2,24 +2,41 @@ const mongoose = require('mongoose');
 const User = require('../models/User');
 const Video = require('../models/Video');
 const Pembayaran = require('../models/Pembayaran');
+const axios = require('axios');
 
-function payWithSnap(res, parameter) {
+function payWithSnap(res, parameter, pembayaran) {
     global.kulturan.midtrans.snap
         .createTransaction(parameter)
         .then((transaction) => {
-            return res.status(200).json({
-                status: 'success',
-                data: {
-                    transactionToken: transaction.token,
-                    redirectURL: transaction.redirect_url,
-                },
-            });
+            pembayaran.paymentDetails.transaction_token = transaction.token;
+            pembayaran
+                .save()
+                .then(() => {
+                    return res.status(200).json({
+                        status: 'success',
+                        data: {
+                            transactionToken: transaction.token,
+                            redirectURL: transaction.redirect_url,
+                        },
+                    });
+                })
+                .catch((err) => {
+                    console.error(err);
+                    return res.status(200).json({
+                        status: 'success',
+                        data: {
+                            transactionToken: transaction.token,
+                            redirectURL: transaction.redirect_url,
+                        },
+                    });
+                });
         })
         .catch((err) => {
             console.error(err);
             return res.status(503).json({
                 status: 'failed',
-                msg: 'Service payment sedang tidak tesedia',
+                msg:
+                    'Service payment sedang tidak tesedia, mohon coba beberapa saat lagi',
             });
         });
 }
@@ -29,7 +46,7 @@ function makePembayaran(res, snapParameter, data) {
     newPembayaran.save((err) => {
         if (err) {
             console.error(err);
-            return res.status(400).json({
+            return res.status(500).json({
                 status: 'failed',
                 msg: 'DB ERROR',
             });
@@ -38,7 +55,7 @@ function makePembayaran(res, snapParameter, data) {
             order_id: newPembayaran._id,
             gross_amount: newPembayaran.totalPrice,
         };
-        return payWithSnap(res, snapParameter);
+        return payWithSnap(res, snapParameter, newPembayaran);
     });
 }
 
@@ -50,9 +67,6 @@ function buy(req, res) {
         },
         credit_card: {
             secure: true,
-        },
-        callbacks: {
-            finish: 'https://example.com', // diisi url callback kalau finish
         },
     };
     if (req.body.hasOwnProperty('videoID')) {
@@ -91,14 +105,14 @@ function buy(req, res) {
                                         });
                                     })
                                     .catch((err) => {
-                                        return res.status(400).json({
+                                        return res.status(500).json({
                                             status: 'failed',
                                             msg: 'DB ERROR',
                                         });
                                     });
                             })
                             .catch((err) => {
-                                return res.status(400).json({
+                                return res.status(500).json({
                                     status: 'failed',
                                     msg: 'DB ERROR',
                                 });
@@ -114,7 +128,7 @@ function buy(req, res) {
                 })
                 .catch((err) => {
                     console.error(err);
-                    return res.status(400).json({
+                    return res.status(500).json({
                         status: 'failed',
                         msg: 'DB ERROR',
                     });
@@ -138,32 +152,39 @@ function buy(req, res) {
             })
             .then((user) => {
                 if (user) {
-                    let totalPrice = 0;
-                    parameter.item_details = user.keranjang.map((video) => {
-                        totalPrice += video.price;
-                        return {
-                            id: video._id,
-                            price: video.price,
-                            quantity: 1,
-                            name: video.title,
-                            brand: video.pementas,
-                            category: 'video',
-                            merchant_name: video.pementas,
-                        };
-                    });
-                    user.keranjang = [];
-                    user.save((err) => {
-                        if (err) {
-                            console.error(err);
-                        }
-                        return makePembayaran(res, parameter, {
-                            userID: res.locals.user.data.id,
-                            paymentDetails: {
-                                item_details: parameter.item_details,
-                            },
-                            totalPrice: totalPrice,
+                    if (user.keranjang.length > 0) {
+                        let totalPrice = 0;
+                        parameter.item_details = user.keranjang.map((video) => {
+                            totalPrice += video.price;
+                            return {
+                                id: video._id,
+                                price: video.price,
+                                quantity: 1,
+                                name: video.title,
+                                brand: video.pementas,
+                                category: 'video',
+                                merchant_name: video.pementas,
+                            };
                         });
-                    });
+                        user.keranjang = [];
+                        user.save((err) => {
+                            if (err) {
+                                console.error(err);
+                            }
+                            return makePembayaran(res, parameter, {
+                                userID: res.locals.user.data.id,
+                                paymentDetails: {
+                                    item_details: parameter.item_details,
+                                },
+                                totalPrice: totalPrice,
+                            });
+                        });
+                    } else {
+                        return res.status(400).json({
+                            status: 'success',
+                            msg: 'Keranjang kosong',
+                        });
+                    }
                 } else {
                     return res.status(400).json({
                         status: 'failed',
@@ -192,7 +213,184 @@ function getStruct(req, res) {
     });
 }
 
-function midtransReceiver(req, res) {
+function midtransChallengeVerify(req, res) {}
+
+function notifStatusPembayaran(data) {
+    let content = '';
+    switch (data.transaction_status) {
+        case 'capture':
+        case 'settlement':
+            if (data.fraud_status === 'accept') {
+                content = `Transaksi ${
+                    data.order_id
+                } sebesar \`${Intl.NumberFormat('id', {
+                    style: 'currency',
+                    currency: 'IDR',
+                }).format(data.gross_amount)}\` berhasil diterima.`;
+            } else if (data.fraud_status === 'challenge') {
+                content = `Transaksi ${
+                    data.order_id
+                } sebesar \`${Intl.NumberFormat('id', {
+                    style: 'currency',
+                    currency: 'IDR',
+                }).format(100000)}\` telah diverifikasi dan berhasil.`;
+            }
+            break;
+        case 'pending':
+            if (data.fraud_status === 'challenge') {
+                content = `Transaksi ${
+                    data.order_id
+                } sebesar \`${Intl.NumberFormat('id', {
+                    style: 'currency',
+                    currency: 'IDR',
+                }).format(
+                    100000
+                )}\` diragukan, kontak admin untuk info lebih lanjut.`;
+            } else {
+                content = `Transaksi baru ${
+                    data.order_id
+                } sebesar \`${Intl.NumberFormat('id', {
+                    style: 'currency',
+                    currency: 'IDR',
+                }).format(100000)}\`.`;
+            }
+            break;
+        case 'expire':
+            content = `Transaksi ${data.order_id} sebesar \`${Intl.NumberFormat(
+                'id',
+                {
+                    style: 'currency',
+                    currency: 'IDR',
+                }
+            ).format(data.gross_amount)}\` kadaluarsa.`;
+            break;
+        case 'refund':
+            content = `Dana dari transaksi ${
+                data.order_id
+            } sebesar \`${Intl.NumberFormat('id', {
+                style: 'currency',
+                currency: 'IDR',
+            }).format(data.gross_amount)}\` telah dikembalikan.`;
+            break;
+        case 'partial_refund':
+            content = `Dana dari transaksi ${
+                data.order_id
+            } sebesar \`${Intl.NumberFormat('id', {
+                style: 'currency',
+                currency: 'IDR',
+            }).format(
+                data.gross_amount
+            )}\` dikembalikan sejumlah \`${Intl.NumberFormat('id', {
+                style: 'currency',
+                currency: 'IDR',
+            }).format(data.refund_amount)}\`.`;
+            break;
+        case 'deny':
+            if (data.fraud_status === 'deny') {
+                content = `Transaksi ${
+                    data.order_id
+                } sebesar \`${Intl.NumberFormat('id', {
+                    style: 'currency',
+                    currency: 'IDR',
+                }).format(
+                    data.gross_amount
+                )}\` ditolak karena diragukan kebenarannya.`;
+            } else {
+                content = `Transaksi ${
+                    data.order_id
+                } sebesar \`${Intl.NumberFormat('id', {
+                    style: 'currency',
+                    currency: 'IDR',
+                }).format(data.gross_amount)}\` ditolak.`;
+            }
+            break;
+        case 'cancel':
+            content = `Transaksi ${data.order_id} sebesar \`${Intl.NumberFormat(
+                'id',
+                {
+                    style: 'currency',
+                    currency: 'IDR',
+                }
+            ).format(data.gross_amount)}\` dibatalkan.`;
+            break;
+        default:
+            break;
+    }
+
+    // notif discord
+    axios.post(process.env.DISCORD_MIDTRANS_BOT, { content });
+}
+
+function midtransPaymentNotificationReceiver(req, res) {
+    // konfirmasi kembali
+    let data = {};
+    axios
+        .get(
+            `${process.env.MIDTRANS_BASE_URL}/v2/${req.body.transaction_id}/status`
+        )
+        .then((response) => {
+            if (response.data.order_id === req.body.order_id) {
+                let data = req.body;
+                Pembayaran.findById(data.order_id).then((pembayaran) => {
+                    if (pembayaran) {
+                        if (
+                            pembayaran.paymentDetails.hasOwnProperty(
+                                'transaction_id'
+                            ) &&
+                            pembayaran.paymentDetails.transaction_id ===
+                                data.transaction_id
+                        ) {
+                            if (data.fraud_status === 'accept') {
+                                switch (data.transaction_status) {
+                                    case 'capture':
+                                    case 'settlement':
+                                        pembayaran.paid = true;
+                                        break;
+                                    default:
+                                        break;
+                                }
+                                if (data.transaction_status != 'pending') {
+                                    delete data.transactionToken;
+                                    delete data.link;
+                                }
+                                pembayaran.paymentDetails.transaction_status =
+                                    data.transaction_status;
+                                pembayaran.paymentDetails.fraud_status =
+                                    data.fraud_status;
+                            }
+                        } else {
+                            pembayaran.paymentDetails.transaction_id =
+                                data.transaction_id;
+                            pembayaran.paymentDetails.payment_type =
+                                data.payment_type;
+                            pembayaran.paymentDetails.transaction_status =
+                                data.transaction_status;
+                            pembayaran.paymentDetails.transaction_time =
+                                data.transaction_time;
+                            pembayaran.paymentDetails.merchant_id =
+                                data.merchant_id;
+                            pembayaran.paymentDetails.fraud_status =
+                                data.fraud_status;
+                            pembayaran.paymentDetails.link = {
+                                instruksi: `https =//app.sandbox.midtrans.com/snap/v1/transactions/${pembayaran.transactionToken}/pdf`,
+                            };
+                        }
+                        pembayaran.save((err) => {
+                            if (err) {
+                                return res.status(500).json({
+                                    status: 'failed',
+                                    msg: 'DB ERROR',
+                                });
+                            }
+                            notifStatusPembayaran(req.body);
+                            return res.status(200).json({
+                                status: 'success',
+                            });
+                        });
+                    }
+                });
+            }
+        });
     return res.status(200).json({
         status: 'success',
         data: {
@@ -204,5 +402,5 @@ function midtransReceiver(req, res) {
 module.exports = {
     buy,
     getStruct,
-    midtransReceiver,
+    midtransPaymentNotificationReceiver,
 };
