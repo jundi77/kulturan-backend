@@ -9,18 +9,8 @@ function payWithSnap(res, parameter, pembayaran) {
         .createTransaction(parameter)
         .then((transaction) => {
             pembayaran.paymentDetails.transaction_token = transaction.token;
-            pembayaran
-                .save()
-                .then(() => {
-                    return res.status(200).json({
-                        status: 'success',
-                        data: {
-                            transactionToken: transaction.token,
-                            redirectURL: transaction.redirect_url,
-                        },
-                    });
-                })
-                .catch((err) => {
+            pembayaran.save((err) => {
+                if (err) {
                     console.error(err);
                     return res.status(200).json({
                         status: 'success',
@@ -28,8 +18,18 @@ function payWithSnap(res, parameter, pembayaran) {
                             transactionToken: transaction.token,
                             redirectURL: transaction.redirect_url,
                         },
+                        msg: 'Warning: token not saved',
                     });
+                }
+                console.log(pembayaran.paymentDetails);
+                return res.status(200).json({
+                    status: 'success',
+                    data: {
+                        transactionToken: transaction.token,
+                        redirectURL: transaction.redirect_url,
+                    },
                 });
+            });
         })
         .catch((err) => {
             console.error(err);
@@ -44,13 +44,6 @@ function payWithSnap(res, parameter, pembayaran) {
 function makePembayaran(res, snapParameter, data) {
     let newPembayaran = new Pembayaran(data);
     newPembayaran.save((err) => {
-        if (err) {
-            console.error(err);
-            return res.status(500).json({
-                status: 'failed',
-                msg: 'DB ERROR',
-            });
-        }
         snapParameter.transaction_details = {
             order_id: newPembayaran._id,
             gross_amount: newPembayaran.totalPrice,
