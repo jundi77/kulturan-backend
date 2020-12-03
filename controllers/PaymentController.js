@@ -94,7 +94,7 @@ function buy(req, res) {
                         // cek kalau sudah pernah beli
                         parameter.item_details = [
                             {
-                                id: video._id,
+                                videoID: video._id,
                                 price: video.price,
                                 quantity: 1,
                                 name: video.title,
@@ -110,7 +110,9 @@ function buy(req, res) {
                                     parameter,
                                     {
                                         userID: res.locals.user.data.id,
-                                        itemDetails: parameter.item_details,
+                                        itemDetails: [
+                                            parameter.item_details[0].videoID,
+                                        ],
                                         totalPrice: video.price,
                                     },
                                     user,
@@ -163,7 +165,7 @@ function buy(req, res) {
                         parameter.item_details = user.keranjang.map((video) => {
                             totalPrice += video.price;
                             return {
-                                id: video._id,
+                                videoID: video._id,
                                 price: video.price,
                                 quantity: 1,
                                 name: video.title,
@@ -177,7 +179,9 @@ function buy(req, res) {
                             parameter,
                             {
                                 userID: res.locals.user.data.id,
-                                itemDetails: parameter.item_details,
+                                itemDetails: parameter.item_details.map(
+                                    (item) => item.videoID
+                                ),
                                 totalPrice: totalPrice,
                             },
                             user
