@@ -3,6 +3,7 @@ const User = require('../models/User');
 const Video = require('../models/Video');
 const Pembayaran = require('../models/Pembayaran');
 const axios = require('axios');
+const dayjs = require('dayjs');
 
 function makePembayaran(res, snapParameter, data, user, videoID = null) {
     let pembayaran = new Pembayaran(data);
@@ -77,6 +78,7 @@ function makePembayaran(res, snapParameter, data, user, videoID = null) {
 }
 
 function buy(req, res) {
+    let date = new Date();
     let parameter = {
         customer_details: {
             first_name: res.locals.user.data.name, // perlu perhatian batas karakter nantinya
@@ -84,6 +86,11 @@ function buy(req, res) {
         },
         credit_card: {
             secure: true,
+        },
+        expiry: {
+            start_time: datejs(date).format('YYYY-MM-DD HH:mm:ss Z'),
+            unit: 'hour',
+            duration: 12,
         },
     };
     if (req.body.hasOwnProperty('videoID')) {
@@ -114,6 +121,11 @@ function buy(req, res) {
                                             parameter.item_details[0].videoID,
                                         ],
                                         totalPrice: video.price,
+                                        paymentDetails: {
+                                            transactionTokenExpire: dayjs(date)
+                                                .add(12, 'hour')
+                                                .toDate(),
+                                        },
                                     },
                                     user,
                                     req.body.videoID
@@ -183,6 +195,11 @@ function buy(req, res) {
                                     (item) => item.videoID
                                 ),
                                 totalPrice: totalPrice,
+                                paymentDetails: {
+                                    transactionTokenExpire: dayjs(date)
+                                        .add(12, 'hour')
+                                        .toDate(),
+                                },
                             },
                             user
                         );
