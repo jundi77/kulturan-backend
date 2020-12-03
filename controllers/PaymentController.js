@@ -262,8 +262,9 @@ function getStructs(req, res) {
                             )
                         ) {
                             struct.link = {};
-                            struct.link.instruction = `${process.env.MIDTRANS_BASE_URL}/snap/v1/transactions/${struct.paymentDetails.transactionToken}/pdf`;
+                            struct.link.instruction = `https://app.sandbox.midtrans.com/snap/v1/transactions/${struct.paymentDetails.transactionToken}/pdf`;
                         }
+                        struct.status = struct.paymentDetails.transactionStatus;
                         delete struct['paymentDetails'];
                         return struct;
                     }),
@@ -289,11 +290,13 @@ function getOneStruct(req, res) {
             select: ['link.thumbnail', 'title', 'pementas', 'price'],
         })
         .then((struct) => {
+            struct = struct.toObject();
             if (struct.paymentDetails.hasOwnProperty('transactionToken')) {
                 struct.link = {};
-                struct.link.instruction = `${process.env.MIDTRANS_BASE_URL}/snap/v1/transactions/${struct.paymentDetails.transactionToken}/pdf`;
+                struct.link.instruction = `https://app.sandbox.midtrans.com/snap/v1/transactions/${struct.paymentDetails.transactionToken}/pdf`;
             }
-            delete struct.paymentDetails;
+            struct.status = struct.paymentDetails.transactionStatus;
+            delete struct['paymentDetails'];
             return res.status(200).json({
                 status: 'success',
                 data: {
