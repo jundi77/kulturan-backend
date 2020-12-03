@@ -9,7 +9,7 @@ function payWithSnap(res, parameter, pembayaran) {
         .createTransaction(parameter)
         .then((transaction) => {
             pembayaran.paymentDetails.transaction_token = transaction.token;
-            pembayaran.save((err) => {
+            pembayaran.paymentDetails.save((err) => {
                 if (err) {
                     console.error(err);
                     return res.status(200).json({
