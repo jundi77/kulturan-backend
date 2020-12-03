@@ -179,7 +179,7 @@ function buy(req, res) {
                         );
                     } else {
                         return res.status(400).json({
-                            status: 'success',
+                            status: 'failed',
                             msg: 'Keranjang kosong',
                         });
                     }
@@ -357,8 +357,8 @@ function midtransPaymentNotificationReceiver(req, res) {
                                         break;
                                 }
                                 if (data.transaction_status != 'pending') {
-                                    delete data.transactionToken;
-                                    delete data.link;
+                                    delete data.paymentDetails.transactionToken;
+                                    delete data.paymentDetails.link;
                                 }
                                 pembayaran.paymentDetails.transaction_status =
                                     data.transaction_status;
