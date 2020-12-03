@@ -65,10 +65,10 @@ function paymentGatewayRoute(app) {
     router.post('/buy', AuthTokenMiddleware(), PaymentController.buy);
     router.get('/struct', AuthTokenMiddleware(), PaymentController.getStruct);
 
-    router.use('/midtrans', MidtransOriginMiddleware({ log: true }));
+    router.use('/midtrans', MidtransOriginMiddleware());
     router.post(
         '/midtrans/payment-notification-receiver',
-        MidtransVerifyNotificationMiddleware({ log: true }),
+        MidtransVerifyNotificationMiddleware(),
         PaymentController.midtransPaymentNotificationReceiver
     );
 
