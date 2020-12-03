@@ -243,7 +243,12 @@ function cancelPayment(req, res) {
 
 function getStructs(req, res) {
     Pembayaran.find({ userID: res.locals.user.data.id })
-        .select('totalPrice paid paymentDetails')
+        .select('totalPrice paid itemDetails')
+        .populate({
+            path: 'itemDetails',
+            model: 'videos',
+            select: ['link.thumbnail', 'title', 'pementas', 'price'],
+        })
         .then((structs) => {
             structs = structs.map((struct) => {
                 if (struct.paymentDetails.hasOwnProperty('transactionToken')) {
@@ -270,7 +275,12 @@ function getStructs(req, res) {
 function getOneStruct(req, res) {
     let paymentID = req.params.paymentid;
     Pembayaran.findById(paymentID)
-        .select('totalPrice paid paymentDetails')
+        .select('totalPrice paid itemDetails')
+        .populate({
+            path: 'itemDetails',
+            model: 'videos',
+            select: ['link.thumbnail', 'title', 'pementas', 'price'],
+        })
         .then((struct) => {
             if (struct.paymentDetails.hasOwnProperty('transactionToken')) {
                 struct.paymentDetails.links = {};
