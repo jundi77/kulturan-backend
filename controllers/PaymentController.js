@@ -194,7 +194,7 @@ function buy(req, res) {
 }
 
 function cancelPayment(req, res) {
-    return res.status(400).json({
+    return res.status(503).json({
         status: 'failed',
         msg: 'OND',
     });
@@ -205,7 +205,7 @@ function cancelPayment(req, res) {
 // function scheduleRequest(req, res) scheduling
 
 function getStruct(req, res) {
-    return res.status(400).json({
+    return res.status(503).json({
         status: 'failed',
         msg: 'OND',
     });
@@ -316,7 +316,7 @@ function notifStatusPembayaran(data) {
     }
 
     // notif discord
-    axios.post(process.env.DISCORD_MIDTRANS_BOT, { content });
+    axios.post(process.env.DISCORD_MIDTRANS_BOT, { content: content });
 }
 
 function midtransPaymentNotificationReceiver(req, res) {
@@ -388,13 +388,12 @@ function midtransPaymentNotificationReceiver(req, res) {
                     }
                 });
             }
+        })
+        .catch((err) => {
+            return res.status(500).json({
+                status: 'failed',
+            });
         });
-    return res.status(200).json({
-        status: 'success',
-        data: {
-            headers: req.headers,
-        },
-    });
 }
 
 module.exports = {
