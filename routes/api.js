@@ -2,7 +2,8 @@ const express = require('express');
 const RegisterController = require('../controllers/auth/RegisterController');
 const LoginController = require('../controllers/auth/LoginController');
 const AuthTokenMiddleware = require('../middlewares/AuthTokenMiddleware');
-const MidtransMiddleware = require('../middlewares/MidtransMiddleware');
+const MidtransOriginMiddleware = require('../middlewares/MidtransOriginMiddleware');
+const MidtransVerifyNotificationMiddleware = require('../middlewares/MidtransVerifyNotificationMiddleware');
 const UserDataController = require('../controllers/UserDataController');
 const VideoController = require('../controllers/VideoController');
 const PaymentController = require('../controllers/PaymentController');
@@ -61,18 +62,15 @@ function videoRoute(app) {
 function paymentGatewayRoute(app) {
     let router = express.Router();
 
-    router.post('/buy', AuthTokenMiddleware(), PaymentController.buy); // mau beli? Perlu add videoID yang array
+    router.post('/buy', AuthTokenMiddleware(), PaymentController.buy);
     router.get('/struct', AuthTokenMiddleware(), PaymentController.getStruct);
+
+    router.use('/midtrans', MidtransOriginMiddleware({ log: true }));
     router.post(
-        '/midtrans-payment-notification-receiver',
-        MidtransMiddleware({ log: true }),
+        '/midtrans/payment-notification-receiver',
+        MidtransVerifyNotificationMiddleware({ log: true }),
         PaymentController.midtransReceiver
-    ); // ambil notifikasi dari midtrans, perlu verifikasi biar ga dimainin
-    router.post(
-        '/midtrans-recurring-notification-receiver',
-        MidtransMiddleware({ log: true }),
-        PaymentController.midtransReceiver
-    ); // ambil notifikasi dari midtrans, perlu verifikasi biar ga dimainin
+    );
 
     app.use('/payment', router);
 }
