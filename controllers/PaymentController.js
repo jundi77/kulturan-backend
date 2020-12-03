@@ -18,7 +18,7 @@ function makePembayaran(res, snapParameter, data, user, videoID = null) {
                     { _id: pembayaran._id },
                     {
                         $set: {
-                            'paymentDetails.transaction_token':
+                            'paymentDetails.transactionToken':
                                 transaction.token,
                         },
                     },
@@ -29,9 +29,11 @@ function makePembayaran(res, snapParameter, data, user, videoID = null) {
                             );
                             if (index > -1) {
                                 user.keranjang.splice(index, 1);
+                                user.markModified('keranjang');
                             }
                         } else {
                             user.keranjang = [];
+                            user.markModified('keranjang');
                         }
                         user.save();
                         if (err) {
@@ -82,6 +84,7 @@ function buy(req, res) {
             Video.findById(req.body.videoID)
                 .then((video) => {
                     if (video) {
+                        // cek kalau sudah pernah beli
                         parameter.item_details = [
                             {
                                 id: video._id,
@@ -100,10 +103,7 @@ function buy(req, res) {
                                     parameter,
                                     {
                                         userID: res.locals.user.data.id,
-                                        paymentDetails: {
-                                            item_details:
-                                                parameter.item_details,
-                                        },
+                                        itemDetails: parameter.item_details,
                                         totalPrice: video.price,
                                     },
                                     user,
@@ -170,9 +170,7 @@ function buy(req, res) {
                             parameter,
                             {
                                 userID: res.locals.user.data.id,
-                                paymentDetails: {
-                                    item_details: parameter.item_details,
-                                },
+                                itemDetails: parameter.item_details,
                                 totalPrice: totalPrice,
                             },
                             user
@@ -205,13 +203,29 @@ function cancelPayment(req, res) {
 // function scheduleRequest(req, res) scheduling
 
 function getStruct(req, res) {
-    return res.status(503).json({
-        status: 'failed',
-        msg: 'OND',
-    });
+    Pembayaran.find({ userID: res.locals.user.data.id })
+        .select('totalPrice paid paymentDetails')
+        .then((structs) => {
+            structs = structs.map((struct) => {
+                if (struct.paymentDetails.hasOwnProperty('transactionToken')) {
+                    struct.paymentDetails.links = {};
+                    struct.paymentDetails.links.instruction = `${process.env.MIDTRANS_BASE_URL}/snap/v1/transactions/${struct.paymentDetails.transactionToken}/pdf`;
+                }
+            });
+            return res.status(200).json({
+                status: 'success',
+                data: {
+                    structs,
+                },
+            });
+        })
+        .catch((err) => {
+            return res.status(500).json({
+                status: 'failed',
+                msg: 'DB ERROR',
+            });
+        });
 }
-
-function midtransChallengeVerify(req, res) {}
 
 function notifStatusPembayaran(data) {
     let content = '';
@@ -342,9 +356,9 @@ function midtransPaymentNotificationReceiver(req, res) {
                     if (pembayaran) {
                         if (
                             pembayaran.paymentDetails.hasOwnProperty(
-                                'transaction_id'
+                                'transactionID'
                             ) &&
-                            pembayaran.paymentDetails.transaction_id ===
+                            pembayaran.paymentDetails.transactionID ===
                                 data.transaction_id
                         ) {
                             if (data.fraud_status === 'accept') {
@@ -358,30 +372,27 @@ function midtransPaymentNotificationReceiver(req, res) {
                                 }
                                 if (data.transaction_status != 'pending') {
                                     delete data.paymentDetails.transactionToken;
-                                    delete data.paymentDetails.link;
+                                    delete data.paymentDetails.links.instruksi;
                                 }
-                                pembayaran.paymentDetails.transaction_status =
+                                pembayaran.paymentDetails.transactionStatus =
                                     data.transaction_status;
-                                pembayaran.paymentDetails.fraud_status =
+                                pembayaran.paymentDetails.fraudStatus =
                                     data.fraud_status;
                             }
                         } else {
-                            pembayaran.paymentDetails.transaction_id =
+                            pembayaran.paymentDetails.transactionID =
                                 data.transaction_id;
-                            pembayaran.paymentDetails.payment_type =
+                            pembayaran.paymentDetails.paymentType =
                                 data.payment_type;
-                            pembayaran.paymentDetails.transaction_status =
+                            pembayaran.paymentDetails.transactionStatus =
                                 data.transaction_status;
-                            pembayaran.paymentDetails.transaction_time = new Date(
+                            pembayaran.paymentDetails.transactionTime = new Date(
                                 data.transaction_time
                             );
-                            pembayaran.paymentDetails.merchant_id =
+                            pembayaran.paymentDetails.merchantID =
                                 data.merchant_id;
-                            pembayaran.paymentDetails.fraud_status =
+                            pembayaran.paymentDetails.fraudStatus =
                                 data.fraud_status;
-                            pembayaran.paymentDetails.link = {
-                                instruksi: `${process.env.MIDTRANS_BASE_URL}/snap/v1/transactions/${pembayaran.paymentDetails.transactionToken}/pdf`,
-                            };
                         }
                         pembayaran.markModified('paymentDetails');
                         pembayaran.save((err) => {
@@ -411,5 +422,6 @@ function midtransPaymentNotificationReceiver(req, res) {
 module.exports = {
     buy,
     getStruct,
+    cancelPayment,
     midtransPaymentNotificationReceiver,
 };
