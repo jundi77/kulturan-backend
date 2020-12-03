@@ -324,7 +324,16 @@ function midtransPaymentNotificationReceiver(req, res) {
     let data = {};
     axios
         .get(
-            `${process.env.MIDTRANS_BASE_URL}/v2/${req.body.transaction_id}/status`
+            `${process.env.MIDTRANS_BASE_URL}/v2/${req.body.transaction_id}/status`,
+            {
+                headers: {
+                    'Content-Type': 'application/json',
+                    accept: 'application/json',
+                    Authorization: `Basic ${Buffer.from(
+                        process.env.MIDTRANS_SERVER_KEY + ':'
+                    )}`,
+                },
+            }
         )
         .then((response) => {
             if (response.data.order_id === req.body.order_id) {
