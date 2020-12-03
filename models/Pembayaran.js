@@ -12,9 +12,16 @@ const PaymentSchema = new Schema(
             type: Boolean,
             default: false,
         },
+        itemDetails: [
+            {
+                type: mongoose.Types.ObjectId,
+                required: true,
+                ref: 'videos',
+            },
+        ],
         paymentDetails: {
             type: Object,
-            required: true,
+            default: {},
         },
         totalPrice: {
             type: Number,
