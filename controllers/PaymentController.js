@@ -298,6 +298,7 @@ function transactionStatusConvert(data) {
         default:
             break;
     }
+    return converted;
 }
 
 function getStructs(req, res) {
