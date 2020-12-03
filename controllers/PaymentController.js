@@ -221,14 +221,14 @@ function notifStatusPembayaran(data) {
             if (data.fraud_status === 'accept') {
                 content = `Transaksi \`${
                     data.order_id
-                }\` sebesar \`\`${Intl.NumberFormat('id', {
+                }\` sebesar \`${Intl.NumberFormat('id', {
                     style: 'currency',
                     currency: 'IDR',
                 }).format(data.gross_amount)}\` berhasil diterima.`;
             } else if (data.fraud_status === 'challenge') {
                 content = `Transaksi \`${
                     data.order_id
-                }\` sebesar \`\`${Intl.NumberFormat('id', {
+                }\` sebesar \`${Intl.NumberFormat('id', {
                     style: 'currency',
                     currency: 'IDR',
                 }).format(
@@ -240,7 +240,7 @@ function notifStatusPembayaran(data) {
             if (data.fraud_status === 'challenge') {
                 content = `Transaksi \`${
                     data.order_id
-                }\` sebesar \`\`${Intl.NumberFormat('id', {
+                }\` sebesar \`${Intl.NumberFormat('id', {
                     style: 'currency',
                     currency: 'IDR',
                 }).format(
@@ -249,7 +249,7 @@ function notifStatusPembayaran(data) {
             } else {
                 content = `Transaksi baru \`${
                     data.order_id
-                }\` sebesar \`\`${Intl.NumberFormat('id', {
+                }\` sebesar \`${Intl.NumberFormat('id', {
                     style: 'currency',
                     currency: 'IDR',
                 }).format(data.gross_amount)}\`.`;
@@ -258,7 +258,7 @@ function notifStatusPembayaran(data) {
         case 'expire':
             content = `Transaksi \`${
                 data.order_id
-            }\` sebesar \`\`${Intl.NumberFormat('id', {
+            }\` sebesar \`${Intl.NumberFormat('id', {
                 style: 'currency',
                 currency: 'IDR',
             }).format(data.gross_amount)}\` kadaluarsa.`;
@@ -266,7 +266,7 @@ function notifStatusPembayaran(data) {
         case 'refund':
             content = `Dana dari transaksi \`${
                 data.order_id
-            }\` sebesar \`\`${Intl.NumberFormat('id', {
+            }\` sebesar \`${Intl.NumberFormat('id', {
                 style: 'currency',
                 currency: 'IDR',
             }).format(data.gross_amount)}\` telah dikembalikan.`;
@@ -274,12 +274,12 @@ function notifStatusPembayaran(data) {
         case 'partial_refund':
             content = `Dana dari transaksi \`${
                 data.order_id
-            }\` sebesar \`\`${Intl.NumberFormat('id', {
+            }\` sebesar \`${Intl.NumberFormat('id', {
                 style: 'currency',
                 currency: 'IDR',
             }).format(
                 data.gross_amount
-            )}\` dikembalikan sejumlah \`\`${Intl.NumberFormat('id', {
+            )}\` dikembalikan sejumlah \`${Intl.NumberFormat('id', {
                 style: 'currency',
                 currency: 'IDR',
             }).format(data.refund_amount)}\`.`;
@@ -288,7 +288,7 @@ function notifStatusPembayaran(data) {
             if (data.fraud_status === 'deny') {
                 content = `Transaksi \`${
                     data.order_id
-                }\` sebesar \`\`${Intl.NumberFormat('id', {
+                }\` sebesar \`${Intl.NumberFormat('id', {
                     style: 'currency',
                     currency: 'IDR',
                 }).format(
@@ -297,7 +297,7 @@ function notifStatusPembayaran(data) {
             } else {
                 content = `Transaksi \`${
                     data.order_id
-                }\` sebesar \`\`${Intl.NumberFormat('id', {
+                }\` sebesar \`${Intl.NumberFormat('id', {
                     style: 'currency',
                     currency: 'IDR',
                 }).format(data.gross_amount)}\` ditolak.`;
@@ -306,7 +306,7 @@ function notifStatusPembayaran(data) {
         case 'cancel':
             content = `Transaksi \`${
                 data.order_id
-            }\` sebesar \`\`${Intl.NumberFormat('id', {
+            }\` sebesar \`${Intl.NumberFormat('id', {
                 style: 'currency',
                 currency: 'IDR',
             }).format(data.gross_amount)}\` dibatalkan.`;
@@ -383,6 +383,7 @@ function midtransPaymentNotificationReceiver(req, res) {
                             };
                         }
                         pembayaran.save((err) => {
+                            console.log(pembayaran);
                             if (err) {
                                 return res.status(500).json({
                                     status: 'failed',
