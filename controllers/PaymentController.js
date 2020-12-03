@@ -95,12 +95,6 @@ function buy(req, res) {
                         ];
                         User.findOne({ _id: res.locals.user.data.id })
                             .then((user) => {
-                                let index = user.keranjang.findIndex(
-                                    (videoID) => videoID == req.body.videoID
-                                );
-                                if (index > -1) {
-                                    user.keranjang.splice(index, 1);
-                                }
                                 return makePembayaran(
                                     res,
                                     parameter,
@@ -171,19 +165,18 @@ function buy(req, res) {
                                 merchant_name: video.pementas,
                             };
                         });
-                        user.keranjang = [];
-                        user.save((err) => {
-                            if (err) {
-                                console.error(err);
-                            }
-                            return makePembayaran(res, parameter, {
+                        return makePembayaran(
+                            res,
+                            parameter,
+                            {
                                 userID: res.locals.user.data.id,
                                 paymentDetails: {
                                     item_details: parameter.item_details,
                                 },
                                 totalPrice: totalPrice,
-                            });
-                        });
+                            },
+                            user
+                        );
                     } else {
                         return res.status(400).json({
                             status: 'success',
