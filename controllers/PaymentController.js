@@ -331,7 +331,7 @@ function midtransPaymentNotificationReceiver(req, res) {
                     accept: 'application/json',
                     Authorization: `Basic ${Buffer.from(
                         process.env.MIDTRANS_SERVER_KEY + ':'
-                    )}`,
+                    ).toString('base64')}`,
                 },
             }
         )
