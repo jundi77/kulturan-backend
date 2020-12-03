@@ -4,59 +4,66 @@ const Video = require('../models/Video');
 const Pembayaran = require('../models/Pembayaran');
 const axios = require('axios');
 
-function payWithSnap(res, parameter, id_pembayaran) {
-    global.kulturan.midtrans.snap
-        .createTransaction(parameter)
-        .then((transaction) => {
-            Pembayaran.findOneAndUpdate(
-                { _id: id_pembayaran },
-                {
-                    $set: {
-                        'paymentDetails.transaction_token': transaction.token,
+function makePembayaran(res, snapParameter, data, user, videoID = null) {
+    let pembayaran = new Pembayaran(data);
+    pembayaran.save((err) => {
+        snapParameter.transaction_details = {
+            order_id: pembayaran._id,
+            gross_amount: pembayaran.totalPrice,
+        };
+        global.kulturan.midtrans.snap
+            .createTransaction(snapParameter)
+            .then((transaction) => {
+                Pembayaran.findOneAndUpdate(
+                    { _id: pembayaran._id },
+                    {
+                        $set: {
+                            'paymentDetails.transaction_token':
+                                transaction.token,
+                        },
                     },
-                },
-                (err, pembayaran) => {
-                    if (err) {
-                        console.error(err);
+                    (err, pembayaran) => {
+                        if (videoID) {
+                            let index = user.keranjang.findIndex(
+                                (videoID) => videoID == req.body.videoID
+                            );
+                            if (index > -1) {
+                                user.keranjang.splice(index, 1);
+                            }
+                        } else {
+                            user.keranjang = [];
+                        }
+                        user.save();
+                        if (err) {
+                            console.error(err);
+                            return res.status(200).json({
+                                status: 'success',
+                                data: {
+                                    transactionToken: transaction.token,
+                                    redirectURL: transaction.redirect_url,
+                                },
+                                msg: 'Warning: token not saved',
+                            });
+                        }
                         return res.status(200).json({
                             status: 'success',
                             data: {
                                 transactionToken: transaction.token,
                                 redirectURL: transaction.redirect_url,
                             },
-                            msg: 'Warning: token not saved',
                         });
                     }
-                    console.log(pembayaran);
-                    console.log(pembayaran.paymentDetails);
-                    return res.status(200).json({
-                        status: 'success',
-                        data: {
-                            transactionToken: transaction.token,
-                            redirectURL: transaction.redirect_url,
-                        },
-                    });
-                }
-            );
-        })
-        .catch((err) => {
-            console.error(err);
-            return res.status(503).json({
-                status: 'failed',
-                msg:
-                    'Service payment sedang tidak tesedia, mohon coba beberapa saat lagi',
+                );
+            })
+            .catch((err) => {
+                // kembalikan keranjang seperti semula harusnya
+                console.error(err);
+                return res.status(503).json({
+                    status: 'failed',
+                    msg:
+                        'Service payment sedang tidak tesedia, mohon coba beberapa saat lagi',
+                });
             });
-        });
-}
-
-function makePembayaran(res, snapParameter, data) {
-    let newPembayaran = new Pembayaran(data);
-    newPembayaran.save((err) => {
-        snapParameter.transaction_details = {
-            order_id: newPembayaran._id,
-            gross_amount: newPembayaran.totalPrice,
-        };
-        return payWithSnap(res, snapParameter, newPembayaran);
     });
 }
 
@@ -94,23 +101,20 @@ function buy(req, res) {
                                 if (index > -1) {
                                     user.keranjang.splice(index, 1);
                                 }
-                                user.save()
-                                    .then((user) => {
-                                        return makePembayaran(res, parameter, {
-                                            userID: res.locals.user.data.id,
-                                            paymentDetails: {
-                                                item_details:
-                                                    parameter.item_details,
-                                            },
-                                            totalPrice: video.price,
-                                        });
-                                    })
-                                    .catch((err) => {
-                                        return res.status(500).json({
-                                            status: 'failed',
-                                            msg: 'DB ERROR',
-                                        });
-                                    });
+                                return makePembayaran(
+                                    res,
+                                    parameter,
+                                    {
+                                        userID: res.locals.user.data.id,
+                                        paymentDetails: {
+                                            item_details:
+                                                parameter.item_details,
+                                        },
+                                        totalPrice: video.price,
+                                    },
+                                    user,
+                                    req.body.videoID
+                                );
                             })
                             .catch((err) => {
                                 return res.status(500).json({
