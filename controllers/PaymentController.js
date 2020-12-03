@@ -243,7 +243,7 @@ function cancelPayment(req, res) {
 
 function getStructs(req, res) {
     Pembayaran.find({ userID: res.locals.user.data.id })
-        .select('totalPrice paid itemDetails')
+        .select('totalPrice paid itemDetails paymentDetails')
         .populate({
             path: 'itemDetails',
             model: 'videos',
@@ -252,9 +252,10 @@ function getStructs(req, res) {
         .then((structs) => {
             structs = structs.map((struct) => {
                 if (struct.paymentDetails.hasOwnProperty('transactionToken')) {
-                    struct.paymentDetails.links = {};
-                    struct.paymentDetails.links.instruction = `${process.env.MIDTRANS_BASE_URL}/snap/v1/transactions/${struct.paymentDetails.transactionToken}/pdf`;
+                    struct.links = {};
+                    struct.links.instruction = `${process.env.MIDTRANS_BASE_URL}/snap/v1/transactions/${struct.paymentDetails.transactionToken}/pdf`;
                 }
+                delete struct.paymentDetails;
                 return struct;
             });
             return res.status(200).json({
@@ -276,7 +277,7 @@ function getStructs(req, res) {
 function getOneStruct(req, res) {
     let paymentID = req.params.paymentid;
     Pembayaran.findById(paymentID)
-        .select('totalPrice paid itemDetails')
+        .select('totalPrice paid itemDetails paymentDetails')
         .populate({
             path: 'itemDetails',
             model: 'videos',
@@ -287,6 +288,7 @@ function getOneStruct(req, res) {
                 struct.paymentDetails.links = {};
                 struct.paymentDetails.links.instruction = `${process.env.MIDTRANS_BASE_URL}/snap/v1/transactions/${struct.paymentDetails.transactionToken}/pdf`;
             }
+            delete struct.paymentDetails;
             return res.status(200).json({
                 status: 'success',
                 data: {
