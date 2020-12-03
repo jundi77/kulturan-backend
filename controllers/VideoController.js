@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const Video = require('../models/Video');
 const Pembayaran = require('../models/Pembayaran');
+const Kategori = require('../models/Kategori');
 
 function getAll(req, res) {
     Video.find({})
