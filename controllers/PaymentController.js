@@ -252,10 +252,11 @@ function getStructs(req, res) {
         .then((structs) => {
             structs = structs.map((struct) => {
                 if (struct.paymentDetails.hasOwnProperty('transactionToken')) {
-                    struct.links = {};
-                    struct.links.instruction = `${process.env.MIDTRANS_BASE_URL}/snap/v1/transactions/${struct.paymentDetails.transactionToken}/pdf`;
+                    struct.link = {};
+                    struct.link.instruction = `${process.env.MIDTRANS_BASE_URL}/snap/v1/transactions/${struct.paymentDetails.transactionToken}/pdf`;
                 }
                 delete struct.paymentDetails;
+                console.log(structs);
                 return struct;
             });
             return res.status(200).json({
@@ -285,8 +286,8 @@ function getOneStruct(req, res) {
         })
         .then((struct) => {
             if (struct.paymentDetails.hasOwnProperty('transactionToken')) {
-                struct.paymentDetails.links = {};
-                struct.paymentDetails.links.instruction = `${process.env.MIDTRANS_BASE_URL}/snap/v1/transactions/${struct.paymentDetails.transactionToken}/pdf`;
+                struct.link = {};
+                struct.link.instruction = `${process.env.MIDTRANS_BASE_URL}/snap/v1/transactions/${struct.paymentDetails.transactionToken}/pdf`;
             }
             delete struct.paymentDetails;
             return res.status(200).json({
