@@ -58,21 +58,21 @@ function editAccount(req, res) {
                                         }
                                     )
                                     .catch((err) => {
-                                        return res.status(400).json({
+                                        return res.status(500).json({
                                             status: 'failed',
                                             msg: 'DB ERROR',
                                         });
                                     });
                             })
                             .catch((err) => {
-                                return res.status(400).json({
+                                return res.status(500).json({
                                     status: 'failed',
                                     msg: 'SERVER ERROR',
                                 });
                             });
                     })
                     .catch((err) => {
-                        return res.status(400).json({
+                        return res.status(500).json({
                             status: 'failed',
                             msg: 'SERVER ERROR',
                         });
@@ -123,7 +123,7 @@ function editAccount(req, res) {
                 });
         })
         .catch((err) => {
-            return res.status(400).json({
+            return res.status(500).json({
                 status: 'failed',
                 msg: 'DB ERROR',
             });
@@ -145,13 +145,14 @@ function getKeranjang(req, res) {
             });
         })
         .catch((err) => {
-            return res.status(400).json({
+            return res.status(500).json({
                 status: 'failed',
                 msg: 'DB ERROR',
             });
         });
 }
 function addToKeranjang(req, res) {
+    // cek dulu kalau sudah pernah beli
     if (req.body.hasOwnProperty('videoID')) {
         if (!objectID.isValid(req.body.videoID)) {
             return res.status(400).json({
@@ -171,40 +172,55 @@ function addToKeranjang(req, res) {
                         },
                     });
                 }
-                User.findOne({ _id: res.locals.user.data.id })
-                    .then((user) => {
-                        if (
-                            !user.keranjang.find(
-                                (videoID) => videoID == req.body.videoID
-                            )
-                        ) {
-                            user.keranjang.push(req.body.videoID);
-                            user.save()
-                                .then((user) => {
-                                    return getKeranjang(req, res);
-                                })
-                                .catch((err) => {
-                                    return res.status(400).json({
-                                        status: 'failed',
-                                        msg: 'DB ERROR',
-                                    });
-                                });
-                        } else {
-                            res.status(200).json({
-                                status: 'success',
-                                msg: 'Video sudah ada di keranjang',
-                            });
-                        }
-                    })
-                    .catch((err) => {
-                        return res.status(400).json({
-                            status: 'failed',
-                            msg: 'DB ERROR',
+                Pembayaran.findOne({
+                    userID: res.locals.user.data.id,
+                    paid: true,
+                    itemDetails: req.body.videoID,
+                }).then((paid) => {
+                    if (paid) {
+                        return res.status(200).json({
+                            status: 'success',
+                            msg: 'Video sudah dibeli',
+                            data: {
+                                transactionID: paid[0]._id,
+                            },
                         });
-                    });
+                    }
+                    User.findOne({ _id: res.locals.user.data.id })
+                        .then((user) => {
+                            if (
+                                !user.keranjang.find(
+                                    (videoID) => videoID == req.body.videoID
+                                )
+                            ) {
+                                user.keranjang.push(req.body.videoID);
+                                user.save()
+                                    .then((user) => {
+                                        return getKeranjang(req, res);
+                                    })
+                                    .catch((err) => {
+                                        return res.status(500).json({
+                                            status: 'failed',
+                                            msg: 'DB ERROR',
+                                        });
+                                    });
+                            } else {
+                                res.status(200).json({
+                                    status: 'success',
+                                    msg: 'Video sudah ada di keranjang',
+                                });
+                            }
+                        })
+                        .catch((err) => {
+                            return res.status(500).json({
+                                status: 'failed',
+                                msg: 'DB ERROR',
+                            });
+                        });
+                });
             })
             .catch((err) => {
-                return res.status(400).json({
+                return res.status(500).json({
                     status: 'failed',
                     msg: 'DB ERROR',
                 });
@@ -250,21 +266,21 @@ function removeFromKeranjang(req, res) {
                                 return getKeranjang(req, res);
                             })
                             .catch((err) => {
-                                return res.status(400).json({
+                                return res.status(500).json({
                                     status: 'failed',
                                     msg: 'DB ERROR',
                                 });
                             });
                     })
                     .catch((err) => {
-                        return res.status(400).json({
+                        return res.status(500).json({
                             status: 'failed',
                             msg: 'DB ERROR',
                         });
                     });
             })
             .catch((err) => {
-                return res.status(400).json({
+                return res.status(500).json({
                     status: 'failed',
                     msg: 'DB ERROR',
                 });
@@ -293,7 +309,7 @@ function getFavorit(req, res) {
             });
         })
         .catch((err) => {
-            return res.status(400).json({
+            return res.status(500).json({
                 status: 'failed',
                 msg: 'DB ERROR',
             });
@@ -337,7 +353,7 @@ function addToFavorit(req, res) {
                                     return getFavorit(req, res);
                                 })
                                 .catch((err) => {
-                                    return res.status(400).json({
+                                    return res.status(500).json({
                                         status: 'failed',
                                         msg: 'DB ERROR',
                                     });
@@ -350,14 +366,14 @@ function addToFavorit(req, res) {
                         }
                     })
                     .catch((err) => {
-                        return res.status(400).json({
+                        return res.status(500).json({
                             status: 'failed',
                             msg: 'DB ERROR',
                         });
                     });
             })
             .catch((err) => {
-                return res.status(400).json({
+                return res.status(500).json({
                     status: 'failed',
                     msg: 'DB ERROR',
                 });
@@ -406,21 +422,21 @@ function removeFromFavorit(req, res) {
                                 return getFavorit(req, res);
                             })
                             .catch((err) => {
-                                return res.status(400).json({
+                                return res.status(500).json({
                                     status: 'failed',
                                     msg: 'DB ERROR',
                                 });
                             });
                     })
                     .catch((err) => {
-                        return res.status(400).json({
+                        return res.status(500).json({
                             status: 'failed',
                             msg: 'DB ERROR',
                         });
                     });
             })
             .catch((err) => {
-                return res.status(400).json({
+                return res.status(500).json({
                     status: 'failed',
                     msg: 'DB ERROR',
                 });
