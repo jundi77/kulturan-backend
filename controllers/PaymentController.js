@@ -311,6 +311,7 @@ function transactionStatusConvert(data) {
 function getStructs(req, res) {
     Pembayaran.find({ userID: res.locals.user.data.id })
         .select('totalPrice paid paymentDetails createdAt')
+        .sort('-createdAt')
         .then((structs) => {
             console.log(structs);
             return res.status(200).json({
