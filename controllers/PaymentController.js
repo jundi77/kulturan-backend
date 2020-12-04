@@ -353,6 +353,12 @@ function getStructs(req, res) {
 
 function getOneStruct(req, res) {
     let paymentID = req.params.paymentid;
+    if (!mongoose.Types.ObjectId.isValid(paymentID)) {
+        return res.status(404).json({
+            status: 'failed',
+            msg: 'Struct tidak ditemukan',
+        });
+    }
     Pembayaran.findById(paymentID)
         .select('totalPrice paid itemDetails paymentDetails createdAt')
         .populate({
@@ -361,6 +367,12 @@ function getOneStruct(req, res) {
             select: ['link.thumbnail', 'title', 'pementas', 'price'],
         })
         .then((struct) => {
+            if (struct == null) {
+                return res.status(404).json({
+                    status: 'failed',
+                    msg: 'Struct tidak ditemukan',
+                });
+            }
             struct = struct.toObject();
             if (struct.paymentDetails.hasOwnProperty('transactionToken')) {
                 // cek kalau sudah kadaluarsa
