@@ -30,6 +30,13 @@ function getFromID(req, res) {
             .populate('categories')
             .then((video) => {
                 if (video) {
+                    let now = Date();
+                    if (now < video.tanggal.pementasan) {
+                        video = video.toObject();
+                        if (video.hasOwnProperty('link')) {
+                            delete video.link.stage;
+                        }
+                    }
                     return res.status(200).json({
                         status: 'success',
                         data: {
