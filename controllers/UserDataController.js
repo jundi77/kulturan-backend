@@ -44,32 +44,22 @@ function editAccount(req, res) {
                             return res.status(400).json(errors);
                         }
 
-                        bcrypt
-                            .genSalt(10, (err, salt) => {
-                                bcrypt
-                                    .hash(
-                                        req.body.password,
-                                        salt,
-                                        (err, hash) => {
-                                            if (err) {
-                                                console.error(err);
-                                            }
-                                            user.password = hash;
-                                        }
-                                    )
-                                    .catch((err) => {
+                        bcrypt.genSalt(10, (err, salt) => {
+                            bcrypt.hash(
+                                req.body.password,
+                                salt,
+                                (err, hash) => {
+                                    if (err) {
+                                        console.error(err);
                                         return res.status(500).json({
                                             status: 'failed',
-                                            msg: 'DB ERROR',
+                                            msg: 'SERVER ERROR',
                                         });
-                                    });
-                            })
-                            .catch((err) => {
-                                return res.status(500).json({
-                                    status: 'failed',
-                                    msg: 'SERVER ERROR',
-                                });
-                            });
+                                    }
+                                    user.password = hash;
+                                }
+                            );
+                        });
                     })
                     .catch((err) => {
                         return res.status(500).json({
@@ -206,7 +196,7 @@ function addToKeranjang(req, res) {
                                     });
                             } else {
                                 return res.status(200).json({
-                                    status: 'success',
+                                    status: 'failed',
                                     msg: 'Video sudah ada di keranjang',
                                 });
                             }
@@ -360,7 +350,7 @@ function addToFavorit(req, res) {
                                 });
                         } else {
                             return res.status(200).json({
-                                status: 'success',
+                                status: 'failed',
                                 msg: 'Video sudah ada di favorit',
                             });
                         }
