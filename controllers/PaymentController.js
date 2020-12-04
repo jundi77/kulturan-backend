@@ -240,6 +240,11 @@ function cancelPayment(req, res) {
                 return res.status(200).json({
                     status: 'success',
                 });
+            } else if (response.status_code == 404) {
+                return res.status(404).json({
+                    status: 'failed',
+                    msg: 'Pembayaran tidak ditemukan',
+                });
             } else {
                 return res.status(200).json({
                     status: 'failed',
@@ -326,6 +331,8 @@ function getStructs(req, res) {
                             ) {
                                 struct.transactionToken =
                                     struct.paymentDetails.transactionToken;
+                                struct.transactionTokenExpire =
+                                    struct.paymentDetails.transactionTokenExpire;
                             }
                         }
                         struct.transactionTime = struct.paymentDetails
@@ -380,6 +387,8 @@ function getOneStruct(req, res) {
                 if (now < struct.paymentDetails.transactionTokenExpire) {
                     struct.transactionToken =
                         struct.paymentDetails.transactionToken;
+                    struct.transactionTokenExpire =
+                        struct.paymentDetails.transactionTokenExpire;
                 }
             }
             struct.transactionTime = struct.paymentDetails.transactionTime
