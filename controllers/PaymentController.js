@@ -242,7 +242,7 @@ function cancelPayment(req, res) {
                 });
             } else {
                 return res.status(200).json({
-                    status: 'success',
+                    status: 'failed',
                     msg: 'Sedang diproses',
                 });
             }
@@ -298,14 +298,14 @@ function transactionStatusConvert(data) {
             return `Transaksi dibatalkan.`;
             break;
         default:
-            return 'Transaksi belum ditentukan.';
+            return 'Cara transaksi belum ditentukan.';
             break;
     }
 }
 
 function getStructs(req, res) {
     Pembayaran.find({ userID: res.locals.user.data.id })
-        .select('totalPrice paid paymentDetails')
+        .select('totalPrice paid paymentDetails createdAt')
         .then((structs) => {
             console.log(structs);
             return res.status(200).json({
@@ -328,9 +328,14 @@ function getStructs(req, res) {
                                     struct.paymentDetails.transactionToken;
                             }
                         }
+                        struct.transactionTime = struct.paymentDetails
+                            .transactionTime
+                            ? struct.paymentDetails.transactionTime
+                            : struct.createdAt;
                         struct.status = transactionStatusConvert(
                             struct.paymentDetails
                         );
+                        delete struct['createdAt'];
                         delete struct['paymentDetails'];
                         return struct;
                     }),
@@ -349,7 +354,7 @@ function getStructs(req, res) {
 function getOneStruct(req, res) {
     let paymentID = req.params.paymentid;
     Pembayaran.findById(paymentID)
-        .select('totalPrice paid itemDetails paymentDetails')
+        .select('totalPrice paid itemDetails paymentDetails createdAt')
         .populate({
             path: 'itemDetails',
             model: 'videos',
@@ -365,7 +370,11 @@ function getOneStruct(req, res) {
                         struct.paymentDetails.transactionToken;
                 }
             }
+            struct.transactionTime = struct.paymentDetails.transactionTime
+                ? struct.paymentDetails.transactionTime
+                : struct.createdAt;
             struct.status = transactionStatusConvert(struct.paymentDetails);
+            delete struct['createdAt'];
             delete struct['paymentDetails'];
             return res.status(200).json({
                 status: 'success',
