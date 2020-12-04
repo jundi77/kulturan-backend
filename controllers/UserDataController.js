@@ -164,50 +164,97 @@ function addToKeranjang(req, res) {
                 }
                 Pembayaran.findOne({
                     userID: res.locals.user.data.id,
-                    paid: true,
                     itemDetails: req.body.videoID,
-                }).then((paid) => {
-                    if (paid) {
-                        return res.status(200).json({
-                            status: 'success',
-                            msg: 'Video sudah dibeli',
-                            data: {
-                                transactionID: paid._id,
-                            },
-                        });
-                    }
-                    User.findOne({ _id: res.locals.user.data.id })
-                        .then((user) => {
-                            if (
-                                !user.keranjang.find(
-                                    (videoID) => videoID == req.body.videoID
-                                )
-                            ) {
-                                user.keranjang.push(req.body.videoID);
-                                user.save()
-                                    .then((user) => {
-                                        return getKeranjang(req, res);
-                                    })
-                                    .catch((err) => {
-                                        return res.status(500).json({
-                                            status: 'failed',
-                                            msg: 'DB ERROR',
-                                        });
-                                    });
-                            } else {
+                })
+                    .then((struct) => {
+                        if (struct) {
+                            if (struct.paid == true) {
                                 return res.status(200).json({
-                                    status: 'failed',
-                                    msg: 'Video sudah ada di keranjang',
+                                    status: 'success',
+                                    msg: 'Video sudah dibeli',
+                                    data: {
+                                        transactionID: struct._id,
+                                    },
                                 });
+                            } else {
+                                switch (
+                                    struct.paymentDetails.transactionStatus
+                                ) {
+                                    case 'pending':
+                                        return res.status(200).json({
+                                            status: 'success',
+                                            msg:
+                                                'Pembelian video sedang diproses',
+                                            data: {
+                                                transactionID: struct._id,
+                                            },
+                                        });
+                                        break;
+                                    default:
+                                        if (
+                                            struct.paymentDetails.hasOwnProperty(
+                                                'transactionToken'
+                                            )
+                                        ) {
+                                            let now = new Date();
+                                            if (
+                                                now <
+                                                struct.paymentDetails
+                                                    .transactionTokenExpire
+                                            ) {
+                                                return res.status(200).json({
+                                                    status: 'success',
+                                                    msg:
+                                                        'Pembelian untuk video ini belum selesai',
+                                                    data: {
+                                                        transactionID:
+                                                            struct._id,
+                                                    },
+                                                });
+                                            }
+                                        }
+                                        break;
+                                }
                             }
-                        })
-                        .catch((err) => {
-                            return res.status(500).json({
-                                status: 'failed',
-                                msg: 'DB ERROR',
+                        }
+                        User.findOne({ _id: res.locals.user.data.id })
+                            .then((user) => {
+                                if (
+                                    !user.keranjang.find(
+                                        (videoID) => videoID == req.body.videoID
+                                    )
+                                ) {
+                                    user.keranjang.push(req.body.videoID);
+                                    user.save()
+                                        .then((user) => {
+                                            return getKeranjang(req, res);
+                                        })
+                                        .catch((err) => {
+                                            return res.status(500).json({
+                                                status: 'failed',
+                                                msg: 'DB ERROR',
+                                            });
+                                        });
+                                } else {
+                                    return res.status(200).json({
+                                        status: 'failed',
+                                        msg: 'Video sudah ada di keranjang',
+                                    });
+                                }
+                            })
+                            .catch((err) => {
+                                return res.status(500).json({
+                                    status: 'failed',
+                                    msg: 'DB ERROR',
+                                });
                             });
+                    })
+                    .catch((err) => {
+                        return res.status(500).json({
+                            status: 'failed',
+                            msg: 'DB ERROR',
                         });
-                });
+                    });
             })
             .catch((err) => {
                 return res.status(500).json({
