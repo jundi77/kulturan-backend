@@ -7,6 +7,7 @@ function getAll(req, res) {
     Video.find({})
         .populate('categories')
         .select(['link.thumbnail', 'title', 'pementas', 'price', 'categories'])
+        .sort('-createdAt')
         .then((videos) => {
             return res.status(200).json({
                 status: 'success',
