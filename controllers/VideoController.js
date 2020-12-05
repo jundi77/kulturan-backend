@@ -38,9 +38,7 @@ function getFromID(req, res) {
                     //         delete video.link.stage;
                     //     }
                     // }
-                    if (paid != null) {
-                        video.paid = paid;
-                    }
+                    video.paid = paid;
                     return res.status(200).json({
                         status: 'success',
                         data: {
