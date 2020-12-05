@@ -23,7 +23,6 @@ router.get('/', (req, res) => {
  * @param app
  */
 const userRoute = (app) => {
-    'use strict';
     let router = express.Router();
 
     router.use('/', AuthTokenMiddleware());
