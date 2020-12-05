@@ -241,9 +241,33 @@ function cancelPayment(req, res) {
                     status: 'success',
                 });
             } else if (response.status_code == 404) {
-                return res.status(404).json({
-                    status: 'failed',
-                    msg: 'Pembayaran tidak ditemukan',
+                Pembayaran.findById(req.params.paymentID).then((struct) => {
+                    if (struct) {
+                        struct.paymentDetails.transactionStatus = 'cancel';
+                        let struct_obj = struct.paymentDetails;
+                        struct_obj.fraud_status = struct_obj.fraudStatus;
+                        struct_obj.gross_amount = struct.totalPrice;
+                        struct_obj.transactionStatus =
+                            struct_obj.transactionStatus;
+                        struct_obj.order_id = struct._id;
+                        notifStatusPembayaranDiscord(struct.paymentDetails);
+                        struct.save((err, struct) => {
+                            if (err) {
+                                return res.status(500).json({
+                                    status: 'failed',
+                                    msg: 'DB ERROR',
+                                });
+                            }
+                            return res.status(200).json({
+                                status: 'success',
+                            });
+                        });
+                    } else {
+                        return res.status(404).json({
+                            status: 'failed',
+                            msg: 'Pembayaran tidak ditemukan',
+                        });
+                    }
                 });
             } else {
                 return res.status(200).json({
