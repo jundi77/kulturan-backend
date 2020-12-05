@@ -320,6 +320,7 @@ function cancelPayment(req, res) {
                             struct_obj.transactionStatus;
                         struct_obj.order_id = struct._id;
                         notifStatusPembayaranDiscord(struct.paymentDetails);
+                        struct.markModified('paymentDetails');
                         struct.save((err, struct) => {
                             if (err) {
                                 return res.status(500).json({
