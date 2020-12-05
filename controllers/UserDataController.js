@@ -170,7 +170,7 @@ function addToKeranjang(req, res) {
                         if (struct) {
                             if (struct.paid == true) {
                                 return res.status(200).json({
-                                    status: 'success',
+                                    status: 'failed',
                                     msg: 'Video sudah dibeli',
                                     data: {
                                         transactionID: struct._id,
@@ -182,7 +182,7 @@ function addToKeranjang(req, res) {
                                 ) {
                                     case 'pending':
                                         return res.status(200).json({
-                                            status: 'success',
+                                            status: 'failed',
                                             msg:
                                                 'Pembelian video sedang diproses',
                                             data: {
@@ -203,7 +203,7 @@ function addToKeranjang(req, res) {
                                                     .transactionTokenExpire
                                             ) {
                                                 return res.status(200).json({
-                                                    status: 'success',
+                                                    status: 'failed',
                                                     msg:
                                                         'Pembelian untuk video ini belum selesai',
                                                     data: {

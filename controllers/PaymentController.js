@@ -103,7 +103,6 @@ function buy(req, res) {
                             itemDetails: req.body.videoID,
                         })
                             .then((struct) => {
-                                console.log(struct);
                                 if (struct) {
                                     if (struct.paid == true) {
                                         return res.status(200).json({
@@ -120,7 +119,7 @@ function buy(req, res) {
                                         ) {
                                             case 'pending':
                                                 return res.status(200).json({
-                                                    status: 'success',
+                                                    status: 'failed',
                                                     msg:
                                                         'Pembelian video sedang diproses',
                                                     data: {
@@ -130,6 +129,7 @@ function buy(req, res) {
                                                 });
                                                 break;
                                             default:
+                                                console.log(struct);
                                                 if (
                                                     struct.paymentDetails.hasOwnProperty(
                                                         'transactionToken'
@@ -139,13 +139,13 @@ function buy(req, res) {
                                                     if (
                                                         now <
                                                         struct.paymentDetails
-                                                            .transactionTokenExpire
+                                                            .transactionExpireTime
                                                     ) {
                                                         return res
                                                             .status(200)
                                                             .json({
                                                                 status:
-                                                                    'success',
+                                                                    'failed',
                                                                 msg:
                                                                     'Pembelian untuk video ini belum selesai',
                                                                 data: {
