@@ -122,7 +122,7 @@ function buy(req, res) {
                                         ],
                                         totalPrice: video.price,
                                         paymentDetails: {
-                                            transactionTokenExpire: dayjs(date)
+                                            transactionExpireTime: dayjs(date)
                                                 .add(12, 'hour')
                                                 .toDate(),
                                         },
@@ -196,7 +196,7 @@ function buy(req, res) {
                                 ),
                                 totalPrice: totalPrice,
                                 paymentDetails: {
-                                    transactionTokenExpire: dayjs(date)
+                                    transactionExpireTime: dayjs(date)
                                         .add(12, 'hour')
                                         .toDate(),
                                 },
@@ -328,12 +328,12 @@ function getStructs(req, res) {
                             let now = new Date();
                             if (
                                 now <
-                                struct.paymentDetails.transactionTokenExpire
+                                struct.paymentDetails.transactionExpireTime
                             ) {
                                 struct.transactionToken =
                                     struct.paymentDetails.transactionToken;
-                                struct.transactionTokenExpire =
-                                    struct.paymentDetails.transactionTokenExpire;
+                                struct.transactionExpireTime =
+                                    struct.paymentDetails.transactionExpireTime;
                             }
                         }
                         struct.transactionTime = struct.paymentDetails
@@ -385,11 +385,11 @@ function getOneStruct(req, res) {
             if (struct.paymentDetails.hasOwnProperty('transactionToken')) {
                 // cek kalau sudah kadaluarsa
                 let now = new Date();
-                if (now < struct.paymentDetails.transactionTokenExpire) {
+                if (now < struct.paymentDetails.transactionExpireTime) {
                     struct.transactionToken =
                         struct.paymentDetails.transactionToken;
-                    struct.transactionTokenExpire =
-                        struct.paymentDetails.transactionTokenExpire;
+                    struct.transactionExpireTime =
+                        struct.paymentDetails.transactionExpireTime;
                 }
             }
             struct.transactionTime = struct.paymentDetails.transactionTime
