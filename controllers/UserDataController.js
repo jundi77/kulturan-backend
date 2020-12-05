@@ -200,7 +200,7 @@ function addToKeranjang(req, res) {
                                             if (
                                                 now <
                                                 struct.paymentDetails
-                                                    .transactionTokenExpire
+                                                    .transactionExpireTime
                                             ) {
                                                 return res.status(200).json({
                                                     status: 'failed',
