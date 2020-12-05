@@ -48,7 +48,6 @@ app.use((err, req, res, next) => {
     return next();
 });
 
-// connect ke mongoooooooooodb
 mongoose
     .connect(process.env.MONGO_URI, {
         // config disuruh sama mongodb
