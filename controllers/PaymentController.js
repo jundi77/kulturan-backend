@@ -129,7 +129,6 @@ function buy(req, res) {
                                                 });
                                                 break;
                                             default:
-                                                console.log(struct);
                                                 if (
                                                     struct.paymentDetails.hasOwnProperty(
                                                         'transactionToken'
@@ -311,8 +310,7 @@ function cancelPayment(req, res) {
                     status: 'success',
                 });
             } else if (response.status_code == 404) {
-                Pembayaran.findById(req.params.paymentID).then((struct) => {
-                    console.log(struct);
+                Pembayaran.findById(req.params.paymentid).then((struct) => {
                     if (struct) {
                         struct.paymentDetails.transactionStatus = 'cancel';
                         let struct_obj = struct.paymentDetails;
@@ -406,7 +404,6 @@ function getStructs(req, res) {
         .select('totalPrice paid paymentDetails createdAt')
         .sort('-createdAt')
         .then((structs) => {
-            console.log(structs);
             return res.status(200).json({
                 status: 'success',
                 data: {
@@ -633,7 +630,6 @@ function midtransPaymentNotificationReceiver(req, res) {
                 Pembayaran.findById(data.order_id)
                     .then((pembayaran) => {
                         if (pembayaran) {
-                            console.log(pembayaran);
                             if (
                                 pembayaran.paymentDetails.hasOwnProperty(
                                     'transactionID'
@@ -681,7 +677,6 @@ function midtransPaymentNotificationReceiver(req, res) {
                             }
                             pembayaran.markModified('paymentDetails');
                             pembayaran.save((err) => {
-                                console.log(pembayaran);
                                 if (err) {
                                     return res.status(500).json({
                                         status: 'failed',
