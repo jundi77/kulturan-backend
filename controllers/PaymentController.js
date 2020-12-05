@@ -98,38 +98,107 @@ function buy(req, res) {
             Video.findById(req.body.videoID)
                 .then((video) => {
                     if (video) {
-                        // cek kalau sudah pernah beli
-                        parameter.item_details = [
-                            {
-                                videoID: video._id,
-                                price: video.price,
-                                quantity: 1,
-                                name: video.title,
-                                brand: video.pementas,
-                                category: 'video',
-                                merchant_name: video.pementas,
-                            },
-                        ];
-                        User.findOne({ _id: res.locals.user.data.id })
-                            .then((user) => {
-                                return makePembayaran(
-                                    res,
-                                    parameter,
+                        Pembayaran.findOne({
+                            userID: res.locals.user.data.id,
+                            itemDetails: req.body.videoID,
+                        })
+                            .then((struct) => {
+                                if (struct) {
+                                    if (struct.paid == true) {
+                                        return res.status(200).json({
+                                            status: 'success',
+                                            msg: 'Video sudah dibeli',
+                                            data: {
+                                                transactionID: struct._id,
+                                            },
+                                        });
+                                    } else {
+                                        switch (
+                                            struct.paymentDetails
+                                                .transactionStatus
+                                        ) {
+                                            case 'pending':
+                                                return res.status(200).json({
+                                                    status: 'success',
+                                                    msg:
+                                                        'Pembelian video sedang diproses',
+                                                    data: {
+                                                        transactionID:
+                                                            struct._id,
+                                                    },
+                                                });
+                                                break;
+                                            default:
+                                                if (
+                                                    struct.paymentDetails.hasOwnProperty(
+                                                        'transactionToken'
+                                                    )
+                                                ) {
+                                                    let now = new Date();
+                                                    if (
+                                                        now <
+                                                        struct.paymentDetails
+                                                            .transactionTokenExpire
+                                                    ) {
+                                                        return res
+                                                            .status(200)
+                                                            .json({
+                                                                status:
+                                                                    'success',
+                                                                msg:
+                                                                    'Pembelian untuk video ini belum selesai',
+                                                                data: {
+                                                                    transactionID:
+                                                                        struct._id,
+                                                                },
+                                                            });
+                                                    }
+                                                }
+                                                break;
+                                        }
+                                    }
+                                }
+                                parameter.item_details = [
                                     {
-                                        userID: res.locals.user.data.id,
-                                        itemDetails: [
-                                            parameter.item_details[0].videoID,
-                                        ],
-                                        totalPrice: video.price,
-                                        paymentDetails: {
-                                            transactionExpireTime: dayjs(date)
-                                                .add(12, 'hour')
-                                                .toDate(),
-                                        },
+                                        videoID: video._id,
+                                        price: video.price,
+                                        quantity: 1,
+                                        name: video.title,
+                                        brand: video.pementas,
+                                        category: 'video',
+                                        merchant_name: video.pementas,
                                     },
-                                    user,
-                                    req.body.videoID
-                                );
+                                ];
+                                User.findOne({ _id: res.locals.user.data.id })
+                                    .then((user) => {
+                                        return makePembayaran(
+                                            res,
+                                            parameter,
+                                            {
+                                                userID: res.locals.user.data.id,
+                                                itemDetails: [
+                                                    parameter.item_details[0]
+                                                        .videoID,
+                                                ],
+                                                totalPrice: video.price,
+                                                paymentDetails: {
+                                                    transactionExpireTime: dayjs(
+                                                        date
+                                                    )
+                                                        .add(12, 'hour')
+                                                        .toDate(),
+                                                },
+                                            },
+                                            user,
+                                            req.body.videoID
+                                        );
+                                    })
+                                    .catch((err) => {
+                                        return res.status(500).json({
+                                            status: 'failed',
+                                            msg: 'DB ERROR',
+                                        });
+                                    });
                             })
                             .catch((err) => {
                                 return res.status(500).json({
