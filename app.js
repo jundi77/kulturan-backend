@@ -50,7 +50,6 @@ app.use((err, req, res, next) => {
 
 mongoose
     .connect(process.env.MONGO_URI, {
-        // config disuruh sama mongodb
         useNewUrlParser: true,
         useUnifiedTopology: true,
         useCreateIndex: true,
