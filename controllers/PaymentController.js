@@ -312,6 +312,7 @@ function cancelPayment(req, res) {
                 });
             } else if (response.status_code == 404) {
                 Pembayaran.findById(req.params.paymentID).then((struct) => {
+                    console.log(struct);
                     if (struct) {
                         struct.paymentDetails.transactionStatus = 'cancel';
                         let struct_obj = struct.paymentDetails;
