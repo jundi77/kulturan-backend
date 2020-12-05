@@ -262,8 +262,6 @@ function cancelPayment(req, res) {
         });
 }
 
-// function scheduleRequest(req, res) scheduling
-
 function transactionStatusConvert(data) {
     switch (data.transactionStatus) {
         case 'capture':
