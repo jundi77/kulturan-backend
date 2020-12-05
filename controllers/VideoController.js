@@ -79,7 +79,7 @@ function getFromID(req, res) {
         });
     } else {
         video = video.select(['-link.stage']);
-        return getVideoDetails(video);
+        return getVideoDetails(video, false);
     }
 }
 
