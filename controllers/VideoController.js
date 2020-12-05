@@ -26,7 +26,7 @@ function getAll(req, res) {
 }
 
 function getFromID(req, res) {
-    const getVideoDetails = (video) => {
+    const getVideoDetails = (video, paid = null) => {
         video
             .populate('categories')
             .then((video) => {
@@ -37,6 +37,9 @@ function getFromID(req, res) {
                         if (video.hasOwnProperty('link')) {
                             delete video.link.stage;
                         }
+                    }
+                    if (paid != null) {
+                        video.paid = paid;
                     }
                     return res.status(200).json({
                         status: 'success',
@@ -69,12 +72,13 @@ function getFromID(req, res) {
             itemDetails: id,
         }).then((struct) => {
             if (!struct) {
-                video = video.select(['-link.stage']); // sementara belum ngecek sudah mbayar atau belum
+                video = video.select(['-link.stage']);
+                return getVideoDetails(video, false);
             }
-            return getVideoDetails(video);
+            return getVideoDetails(video, true);
         });
     } else {
-        video = video.select(['-link.stage']); // sementara belum ngecek sudah mbayar atau belum
+        video = video.select(['-link.stage']);
         return getVideoDetails(video);
     }
 }
