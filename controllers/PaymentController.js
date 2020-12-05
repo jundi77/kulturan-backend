@@ -316,7 +316,7 @@ function cancelPayment(req, res) {
                         let struct_obj = struct.paymentDetails;
                         struct_obj.fraud_status = struct_obj.fraudStatus;
                         struct_obj.gross_amount = struct.totalPrice;
-                        struct_obj.transactionStatus =
+                        struct_obj.transaction_status =
                             struct_obj.transactionStatus;
                         struct_obj.order_id = struct._id;
                         notifStatusPembayaranDiscord(struct.paymentDetails);
