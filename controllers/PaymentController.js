@@ -103,6 +103,7 @@ function buy(req, res) {
                             itemDetails: req.body.videoID,
                         })
                             .then((struct) => {
+                                console.log(struct);
                                 if (struct) {
                                     if (struct.paid == true) {
                                         return res.status(200).json({
