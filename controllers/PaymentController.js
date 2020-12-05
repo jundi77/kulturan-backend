@@ -33,7 +33,7 @@ function makePembayaran(res, snapParameter, data, user, videoID = null) {
                     (err, pembayaran) => {
                         if (videoID) {
                             let index = user.keranjang.findIndex(
-                                (videoID) => videoID == req.body.videoID
+                                (_videoID) => _videoID == videoID
                             );
                             if (index > -1) {
                                 user.keranjang.splice(index, 1);
