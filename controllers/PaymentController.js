@@ -101,6 +101,9 @@ function buy(req, res) {
                         Pembayaran.findOne({
                             userID: res.locals.user.data.id,
                             itemDetails: req.body.videoID,
+                            'paymentDetails.transactionStatus': {
+                                $nin: ['cancel'],
+                            },
                         })
                             .then((struct) => {
                                 if (struct) {
