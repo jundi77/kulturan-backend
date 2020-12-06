@@ -6,7 +6,6 @@ require('dotenv').config();
 
 const express = require('express');
 const mongoose = require('mongoose');
-const passport = require('passport');
 const cors = require('cors');
 const utils = require('./utils');
 const app = express();
@@ -68,6 +67,7 @@ apiRoute.userRoute(app);
 apiRoute.videoRoute(app);
 apiRoute.paymentGatewayRoute(app);
 app.use('/', (req, res) => {
+    console.log(req);
     return res.status(404).json({
         status: 'failed',
         msg: 'You get lost.',
