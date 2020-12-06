@@ -172,7 +172,7 @@ function addToKeranjang(req, res) {
                     .then((struct) => {
                         if (struct) {
                             if (struct.paid == true) {
-                                return res.status(200).json({
+                                return res.status(400).json({
                                     status: 'failed',
                                     msg: 'Video sudah dibeli',
                                     data: {
@@ -184,7 +184,7 @@ function addToKeranjang(req, res) {
                                     struct.paymentDetails.transactionStatus
                                 ) {
                                     case 'pending':
-                                        return res.status(200).json({
+                                        return res.status(400).json({
                                             status: 'failed',
                                             msg:
                                                 'Pembelian video sedang diproses',
@@ -207,7 +207,7 @@ function addToKeranjang(req, res) {
                                                 struct.paymentDetails
                                                     .transactionExpireTime
                                             ) {
-                                                return res.status(200).json({
+                                                return res.status(400).json({
                                                     status: 'failed',
                                                     msg:
                                                         'Pembelian untuk video ini belum selesai',
@@ -241,7 +241,7 @@ function addToKeranjang(req, res) {
                                             });
                                         });
                                 } else {
-                                    return res.status(200).json({
+                                    return res.status(400).json({
                                         status: 'failed',
                                         msg: 'Video sudah ada di keranjang',
                                     });
@@ -401,7 +401,7 @@ function addToFavorit(req, res) {
                                     });
                                 });
                         } else {
-                            return res.status(200).json({
+                            return res.status(400).json({
                                 status: 'failed',
                                 msg: 'Video sudah ada di favorit',
                             });

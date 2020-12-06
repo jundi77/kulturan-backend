@@ -123,7 +123,7 @@ function buy(req, res) {
                                                 .transactionStatus
                                         ) {
                                             case 'pending':
-                                                return res.status(200).json({
+                                                return res.status(400).json({
                                                     status: 'failed',
                                                     msg:
                                                         'Pembelian video sedang diproses',
@@ -148,7 +148,7 @@ function buy(req, res) {
                                                             .transactionExpireTime
                                                     ) {
                                                         return res
-                                                            .status(200)
+                                                            .status(400)
                                                             .json({
                                                                 status:
                                                                     'failed',
@@ -214,7 +214,7 @@ function buy(req, res) {
                                 });
                             });
                     } else {
-                        return res.status(400).json({
+                        return res.status(404).json({
                             status: 'failed',
                             msg: {
                                 videoID: 'Video tidak ditemukan',
@@ -347,7 +347,7 @@ function cancelPayment(req, res) {
                     }
                 });
             } else {
-                return res.status(200).json({
+                return res.status(400).json({
                     status: 'failed',
                     msg: 'Sedang diproses',
                 });
@@ -355,7 +355,7 @@ function cancelPayment(req, res) {
         })
         .catch((err) => {
             console.error(err);
-            return res.status(200).json({
+            return res.status(400).json({
                 status: 'failed',
                 msg:
                     'Sedang diproses, jika tidak kunjung batal, coba lagi dalam 1 jam atau hubungi admin',
