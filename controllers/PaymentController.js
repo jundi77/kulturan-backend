@@ -128,6 +128,8 @@ function buy(req, res) {
                                                     },
                                                 });
                                                 break;
+                                            case 'cancel':
+                                                break;
                                             default:
                                                 if (
                                                     struct.paymentDetails.hasOwnProperty(
