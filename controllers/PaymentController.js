@@ -83,7 +83,7 @@ function buy(req, res) {
     let date = new Date();
     let parameter = {
         customer_details: {
-            first_name: res.locals.user.data.name, // perlu perhatian batas karakter nantinya
+            first_name: res.locals.user.data.name,
             email: res.locals.user.data.email,
         },
         credit_card: {
