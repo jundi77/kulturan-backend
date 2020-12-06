@@ -49,6 +49,7 @@ function makePembayaran(res, snapParameter, data, user, videoID = null) {
                             return res.status(200).json({
                                 status: 'success',
                                 data: {
+                                    transactionID: pembayaran._id,
                                     transactionToken: transaction.token,
                                     redirectURL: transaction.redirect_url,
                                 },
@@ -58,6 +59,7 @@ function makePembayaran(res, snapParameter, data, user, videoID = null) {
                         return res.status(200).json({
                             status: 'success',
                             data: {
+                                transactionID: pembayaran._id,
                                 transactionToken: transaction.token,
                                 redirectURL: transaction.redirect_url,
                             },
