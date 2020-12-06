@@ -21,7 +21,7 @@ function checkRequestOrigin(options) {
         ) {
             return next();
         } else {
-            return res.status(401).json({
+            return res.status(403).json({
                 status: 'failed',
                 msg: 'Who are you?',
             });
