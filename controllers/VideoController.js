@@ -68,13 +68,21 @@ function getFromID(req, res) {
             userID: res.locals.user.data.id,
             paid: true,
             itemDetails: id,
-        }).then((struct) => {
-            if (!struct) {
-                video = video.select(['-link.stage']);
-                return getVideoDetails(video, false);
-            }
-            return getVideoDetails(video, true);
-        });
+        })
+            .then((struct) => {
+                if (!struct) {
+                    video = video.select(['-link.stage']);
+                    return getVideoDetails(video, false);
+                }
+                return getVideoDetails(video, true);
+            })
+            .catch((err) => {
+                console.error(err);
+                return res.status(500).json({
+                    status: 'failed',
+                    msg: 'DB ERROR',
+                });
+            });
     } else {
         video = video.select(['-link.stage']);
         return getVideoDetails(video, false);
