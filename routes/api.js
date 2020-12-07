@@ -96,6 +96,13 @@ function authRoute(app) {
     router.post('/register', RegisterController);
     router.post('/login', LoginController);
     router.post('/verif-token', AuthTokenMiddleware({ sendUserData: true }));
+    router.get('/google/callback', (req, res) => {
+        console.log('GOOGLE NGASIH CALLBACK');
+        console.log(req.params);
+        console.log(req.body);
+
+        return res.status(200);
+    });
 
     app.use('/auth', router);
 }
