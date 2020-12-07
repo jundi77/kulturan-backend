@@ -38,6 +38,7 @@ function getFromID(req, res) {
                     //         delete video.link.stage;
                     //     }
                     // }
+                    video = video.toObject();
                     video.paid = paid;
                     return res.status(200).json({
                         status: 'success',
