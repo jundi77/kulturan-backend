@@ -127,7 +127,11 @@ function getPaidVideos(req, res) {
         userID: res.locals.user.data.id,
         paid: true,
     })
-        .populate('itemDetails')
+        .populate({
+            path: 'itemDetails',
+            model: 'videos',
+            select: ['link.thumbnail', 'title', 'pementas', 'price'],
+        })
         .then((structs) => {
             let videos = [];
             if (structs.length > 0) {
