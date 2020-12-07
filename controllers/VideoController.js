@@ -123,25 +123,6 @@ function isPaid(req, res) {
 }
 
 function getPaidVideos(req, res) {
-    Video.find({})
-        .populate('categories')
-        .select(['link.thumbnail', 'title', 'pementas', 'price', 'categories'])
-        .sort('-createdAt title')
-        .then((videos) => {
-            return res.status(200).json({
-                status: 'success',
-                data: {
-                    videos,
-                },
-            });
-        })
-        .catch((err) => {
-            console.error(err);
-            return res.status(500).json({
-                status: 'failed',
-                msg: 'DB ERROR',
-            });
-        });
     Pembayaran.find({
         userID: res.locals.user.data.id,
         paid: true,
