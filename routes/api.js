@@ -45,6 +45,12 @@ function videoRoute(app) {
     let router = express.Router();
 
     router.get('/', VideoController.getAll);
+    router.get('/paid', AuthTokenMiddleware(), VideoController.getPaidVideos);
+    router.get(
+        '/paid/check/:videoid',
+        AuthTokenMiddleware({ nextWhenNoToken: true }),
+        VideoController.isPaid
+    );
     router.get(
         '/:videoid',
         AuthTokenMiddleware({ nextWhenNoToken: true }),
