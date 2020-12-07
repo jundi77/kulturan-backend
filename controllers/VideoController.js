@@ -81,7 +81,43 @@ function getFromID(req, res) {
     }
 }
 
+function isPaid(req, res) {
+    let id = req.params.videoid;
+    if (res.locals && res.locals.user) {
+        Pembayaran.findOne({
+            userID: res.locals.user.data.id,
+            paid: true,
+            itemDetails: id,
+        })
+            .then((struct) => {
+                return res.status(200).json({
+                    status: 'success',
+                    data: {
+                        paid: struct ? true : false,
+                    },
+                });
+            })
+            .catch((err) => {
+                console.error(err);
+                return res.status(500).json({
+                    status: 'failed',
+                    msg: 'DB ERROR',
+                });
+            });
+    } else {
+        return res.status(200).json({
+            status: 'success',
+            data: {
+                paid: false,
+            },
+        });
+    }
+}
+function getPaidVideos(req, res) {}
+
 module.exports = {
     getAll,
     getFromID,
+    isPaid,
+    getPaidVideos,
 };
