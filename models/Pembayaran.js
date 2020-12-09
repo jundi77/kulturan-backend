@@ -1,9 +1,10 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
+const nanoid = require('../config/PaymentNanoIdConfig')(require('nanoid'));
 
 const generatePaymentId = () => {
     let now = new Date();
-    let randStr = global.kulturan.models.Pembayaran.nanoid();
+    let randStr = nanoid();
     console.log('nanoid: ' + randStr);
     return `${now.getFullYear() % 100}${
         now.getMonth() + 1
