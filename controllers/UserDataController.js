@@ -61,6 +61,49 @@ function editAccount(req, res) {
                                         });
                                     }
                                     user.password = hash;
+                                    user.markModified('password');
+                                    user.save()
+                                        .then((user) => {
+                                            /**
+                                             * Payload untuk JWT **
+                                             * Ini bisa diparsing di client untuk digunakan sebagai data user,
+                                             * namun tidak bisa diubah setelah token dibuat.
+                                             */
+                                            const payload = {
+                                                id: user.id,
+                                                email: user.email,
+                                                name: user.name,
+                                            };
+
+                                            JWT.sign(
+                                                payload,
+                                                process.env.secretOrKey,
+                                                {
+                                                    expiresIn: 31556926, // a year
+                                                },
+                                                (err, token) => {
+                                                    if (err) {
+                                                        console.error(err);
+                                                        throw err;
+                                                    }
+                                                    res.status(200).json({
+                                                        status: 'success',
+                                                        data: {
+                                                            token,
+                                                            id: user.id,
+                                                            name: user.name,
+                                                            email: user.email,
+                                                        },
+                                                    });
+                                                }
+                                            );
+                                        })
+                                        .catch((err) => {
+                                            return res.status(400).json({
+                                                status: 'failed',
+                                                msg: 'Email telah terdaftar.',
+                                            });
+                                        });
                                 }
                             );
                         });
@@ -72,49 +115,6 @@ function editAccount(req, res) {
                         });
                     });
             }
-
-            user.save()
-                .then((user) => {
-                    /**
-                     * Payload untuk JWT **
-                     * Ini bisa diparsing di client untuk digunakan sebagai data user,
-                     * namun tidak bisa diubah setelah token dibuat.
-                     */
-                    const payload = {
-                        id: user.id,
-                        email: user.email,
-                        name: user.name,
-                    };
-
-                    JWT.sign(
-                        payload,
-                        process.env.secretOrKey,
-                        {
-                            expiresIn: 31556926, // a year
-                        },
-                        (err, token) => {
-                            if (err) {
-                                console.error(err);
-                                throw err;
-                            }
-                            res.status(200).json({
-                                status: 'success',
-                                data: {
-                                    token,
-                                    id: user.id,
-                                    name: user.name,
-                                    email: user.email,
-                                },
-                            });
-                        }
-                    );
-                })
-                .catch((err) => {
-                    return res.status(400).json({
-                        status: 'failed',
-                        msg: 'Email telah terdaftar.',
-                    });
-                });
         })
         .catch((err) => {
             return res.status(500).json({
