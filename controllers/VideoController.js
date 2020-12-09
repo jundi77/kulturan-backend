@@ -62,6 +62,12 @@ function getFromID(req, res) {
     };
 
     let id = req.params.videoid;
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+        return res.status(404).json({
+            status: 'failed',
+            msg: 'Video tidak ditemukan',
+        });
+    }
     let video = Video.findById(id);
     if (res.locals && res.locals.user) {
         // kalau sudah ready, ini jalan

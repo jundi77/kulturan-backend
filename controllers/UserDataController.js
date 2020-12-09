@@ -24,9 +24,9 @@ function editAccount(req, res) {
     User.findOne({ _id: res.locals.user.data.id })
         .then((user) => {
             if (!user) {
-                return res.status(400).json({
+                return res.status(404).json({
                     status: 'failed',
-                    msg: 'Invalid user',
+                    msg: 'User tidak ditemukan',
                 });
             }
 
@@ -335,7 +335,7 @@ function removeFromKeranjang(req, res) {
         Video.findOne({ _id: req.body.videoID })
             .then((video) => {
                 if (!video) {
-                    return res.status(400).json({
+                    return res.status(404).json({
                         status: 'failed',
                         msg: {
                             videoID: 'Video tidak ditemukan',
