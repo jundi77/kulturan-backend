@@ -3,6 +3,10 @@ const Schema = mongoose.Schema;
 
 const PaymentSchema = new Schema(
     {
+        _id: {
+            type: String,
+            default: generatePaymentId(),
+        },
         userID: {
             type: mongoose.Types.ObjectId,
             required: true,
@@ -30,5 +34,12 @@ const PaymentSchema = new Schema(
     },
     { timestamps: true }
 );
+
+const generatePaymentId = () => {
+    let now = new Date();
+    return `${now.getFullYear() % 100}${
+        now.getMonth() + 1
+    }${now.getDate()}${global.kulturan.Pembayaran.nanoid()}`;
+};
 
 module.exports = Pembayaran = mongoose.model('payments', PaymentSchema);
