@@ -27,6 +27,10 @@ global.kulturan.googleapis = require('googleapis');
 global.kulturan.log = {};
 global.kulturan.log.discord = require('./controllers/LogController');
 global.kulturan.models = {};
+global.kulturan.models.Pembayaran = {};
+global.kulturan.models.Pembayaran.nanoid = require('./config/PaymentNanoIdConfig')(
+    require('nanoid')
+);
 
 /**
  * app.use apaan?
