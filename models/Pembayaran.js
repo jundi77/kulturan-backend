@@ -5,9 +5,9 @@ const generatePaymentId = () => {
     let now = new Date();
     let randStr = require('../config/PaymentNanoIdConfig')(require('nanoid'));
     console.log('nanoid: ' + randStr());
-    return `${now.getFullYear() % 100}${
-        now.getMonth() + 1
-    }${now.getDate()}${randStr()}`;
+    return `${now.getFullYear() % 100}${now.getMonth() + 1}${
+        now.getDate() < 10 ? '0' + now.getDate() : now.getDate()
+    }${randStr()}`;
 };
 
 const PaymentSchema = new Schema(
