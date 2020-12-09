@@ -44,10 +44,6 @@ function makePembayaran(req, res, snapParameter, data, user, videoID = null) {
                             user.markModified('keranjang');
                         }
                         user.save();
-                        global.kulturan.log.discord(
-                            req,
-                            `User \`${req.locals.user.data.email}\` melakukan pembelian baru dengan id \`${pembayaran._id}\``
-                        );
                         if (err) {
                             console.error(err);
                             return res.status(200).json({
