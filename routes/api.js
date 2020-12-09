@@ -26,11 +26,7 @@ const userRoute = (app) => {
     let router = express.Router();
 
     router.use('/', AuthTokenMiddleware());
-    router.put(
-        '/edit-account',
-        AuthTokenMiddleware(),
-        UserDataController.editAccount
-    );
+    router.put('/edit-account', UserDataController.editAccount);
     router.get('/keranjang', UserDataController.getKeranjang);
     router.put('/keranjang', UserDataController.addToKeranjang);
     router.put('/keranjang/delete', UserDataController.removeFromKeranjang);
