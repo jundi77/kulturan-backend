@@ -5,7 +5,7 @@ const Pembayaran = require('../models/Pembayaran');
 const axios = require('axios');
 const dayjs = require('dayjs');
 
-function makePembayaran(res, snapParameter, data, user, videoID = null) {
+function makePembayaran(req, res, snapParameter, data, user, videoID = null) {
     let pembayaran = new Pembayaran(data);
     pembayaran.save((err) => {
         if (err) {
@@ -183,6 +183,7 @@ function buy(req, res) {
                                 User.findOne({ _id: res.locals.user.data.id })
                                     .then((user) => {
                                         return makePembayaran(
+                                            req,
                                             res,
                                             parameter,
                                             {
@@ -267,6 +268,7 @@ function buy(req, res) {
                             };
                         });
                         return makePembayaran(
+                            req,
                             res,
                             parameter,
                             {
