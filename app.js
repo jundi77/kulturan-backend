@@ -10,7 +10,6 @@ const cors = require('cors');
 const utils = require('./utils');
 const app = express();
 const midtransClient = require('midtrans-client');
-const { getClientIp } = require('@supercharge/request-ip');
 const GetIp = require('./middlewares/GetResIpMiddleware');
 
 /**
@@ -25,7 +24,6 @@ global.kulturan.midtrans.snap = new midtransClient.Snap({
     clientKey: process.env.MIDTRANS_CLIENT_KEY,
 });
 global.kulturan.googleapis = require('googleapis');
-global.kulturan.getClientIp = getClientIp;
 global.kulturan.log = {};
 global.kulturan.log.discord = require('./controllers/LogController');
 global.kulturan.models = {};
