@@ -3,10 +3,11 @@ const Schema = mongoose.Schema;
 
 const generatePaymentId = () => {
     let now = new Date();
-    console.log('nanoid: ' + global.kulturan.models.Pembayaran.nanoid());
+    let randStr = global.kulturan.models.Pembayaran.nanoid();
+    console.log('nanoid: ' + randStr);
     return `${now.getFullYear() % 100}${
         now.getMonth() + 1
-    }${now.getDate()}${global.kulturan.models.Pembayaran.nanoid()}`;
+    }${now.getDate()}${randStr}`;
 };
 
 const PaymentSchema = new Schema(
