@@ -34,7 +34,7 @@ function verifyToken(options) {
                         if (options && options.sendUserData === true) {
                             global.kulturan.log.discord(
                                 req,
-                                `User \`${newUser.email}\` meminta detail token auth`
+                                `User \`${res.locals.user.data.email}\` meminta detail token auth`
                             );
                             return res.status(200).json(res.locals.user);
                         }
