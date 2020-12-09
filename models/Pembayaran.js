@@ -14,7 +14,7 @@ const PaymentSchema = new Schema(
     {
         _id: {
             type: String,
-            default: generatePaymentId(),
+            default: () => generatePaymentId(),
         },
         userID: {
             type: mongoose.Types.ObjectId,
