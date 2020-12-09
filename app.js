@@ -72,7 +72,7 @@ mongoose
         throw err;
     });
 
-app.use('/', GetIp);
+app.use('/', GetIp());
 let apiRoute = require('./routes/api');
 apiRoute.authRoute(app);
 apiRoute.userRoute(app);
