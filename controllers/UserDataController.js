@@ -6,6 +6,7 @@ const JWT = require('jsonwebtoken');
 const objectID = require('mongoose').Types.ObjectId;
 
 function editAccount(req, res) {
+    global.kulturan.log.discord(req, `User \`${newUser.email}\` mengedit akun`);
     let { errors, isValid, empty } = validateUserData(req.body);
     if (!isValid) {
         errors = { msg: errors };

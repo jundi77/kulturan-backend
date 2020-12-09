@@ -2,6 +2,7 @@ const bcrypt = require('bcryptjs');
 const validateRegisterInput = require('../form/validation/RegisterFormValidation');
 const User = require('../../models/User');
 const LoginController = require('./LoginController');
+const axios = require('axios');
 require('../form/validation/RegisterFormValidation');
 
 const RegisterController = (req, res) => {
@@ -36,6 +37,10 @@ const RegisterController = (req, res) => {
                     }
                     newUser.password = hash;
                     newUser.save().then((user) => {
+                        global.kulturan.log.discord(
+                            req,
+                            `User baru \`${newUser.email}\` telah terdaftar`
+                        );
                         return LoginController(req, res);
                     });
                 });

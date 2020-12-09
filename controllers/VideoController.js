@@ -92,6 +92,10 @@ function getFromID(req, res) {
 
 function isPaid(req, res) {
     let id = req.params.videoid;
+    global.kulturan.log.discord(
+        req,
+        `User \`${newUser.email}\` meminta status paid video \`${id}\``
+    );
     if (res.locals && res.locals.user) {
         Pembayaran.findOne({
             userID: res.locals.user.data.id,
@@ -124,6 +128,10 @@ function isPaid(req, res) {
 }
 
 function getPaidVideos(req, res) {
+    global.kulturan.log.discord(
+        req,
+        `User \`${newUser.email}\` meminta list video yang telah dibayar`
+    );
     Pembayaran.find({
         userID: res.locals.user.data.id,
         paid: true,

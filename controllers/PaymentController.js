@@ -44,6 +44,10 @@ function makePembayaran(res, snapParameter, data, user, videoID = null) {
                             user.markModified('keranjang');
                         }
                         user.save();
+                        global.kulturan.log.discord(
+                            req,
+                            `User \`${newUser.email}\` melakukan pembelian baru dengan id \`${pembayaran._id}\``
+                        );
                         if (err) {
                             console.error(err);
                             return res.status(200).json({
@@ -296,6 +300,10 @@ function buy(req, res) {
 }
 
 function cancelPayment(req, res) {
+    global.kulturan.log.discord(
+        req,
+        `User \`${newUser.email}\` membatalkan pembayaran dengan id \`${req.params.paymentid}\``
+    );
     axios
         .post(
             `${process.env.MIDTRANS_BASE_URL}/v2/${req.params.paymentid}/cancel`,
@@ -408,6 +416,10 @@ function transactionStatusConvert(data) {
 }
 
 function getStructs(req, res) {
+    global.kulturan.log.discord(
+        req,
+        `User \`${newUser.email}\` meminta seluruh history pembayaran`
+    );
     Pembayaran.find({ userID: res.locals.user.data.id })
         .select('totalPrice paid paymentDetails createdAt')
         .sort('-createdAt')
@@ -459,6 +471,10 @@ function getStructs(req, res) {
 
 function getOneStruct(req, res) {
     let paymentID = req.params.paymentid;
+    global.kulturan.log.discord(
+        req,
+        `User \`${newUser.email}\` meminta detail histori pembayaran dengan id \`${paymentID}\``
+    );
     if (!mongoose.Types.ObjectId.isValid(paymentID)) {
         return res.status(404).json({
             status: 'failed',
