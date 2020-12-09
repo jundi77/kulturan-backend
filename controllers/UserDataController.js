@@ -50,7 +50,7 @@ function editAccount(req, res) {
 
                         bcrypt.genSalt(10, (err, salt) => {
                             bcrypt.hash(
-                                req.body.password,
+                                req.body.newPassword,
                                 salt,
                                 (err, hash) => {
                                     if (err) {
