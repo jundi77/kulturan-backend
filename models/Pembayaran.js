@@ -5,7 +5,7 @@ const generatePaymentId = () => {
     let now = new Date();
     return `${now.getFullYear() % 100}${
         now.getMonth() + 1
-    }${now.getDate()}${global.kulturan.Pembayaran.nanoid()}`;
+    }${now.getDate()}${global.kulturan.models.Pembayaran.nanoid()}`;
 };
 
 const PaymentSchema = new Schema(
