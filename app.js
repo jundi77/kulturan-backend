@@ -11,7 +11,6 @@ const utils = require('./utils');
 const app = express();
 const midtransClient = require('midtrans-client');
 const { getClientIp } = require('@supercharge/request-ip');
-const GetIp = require('./middlewares/GetResIpMiddleware');
 
 /**
  * Import yang diperlukan ke global
@@ -72,7 +71,6 @@ mongoose
         throw err;
     });
 
-app.use('/', GetIp);
 let apiRoute = require('./routes/api');
 apiRoute.authRoute(app);
 apiRoute.userRoute(app);
