@@ -1,14 +1,13 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
-const nanoid = require('../config/PaymentNanoIdConfig')(require('nanoid'));
 
 const generatePaymentId = () => {
     let now = new Date();
-    let randStr = nanoid();
-    console.log('nanoid: ' + randStr);
+    let randStr = require('../config/PaymentNanoIdConfig')(require('nanoid'));
+    console.log('nanoid: ' + randStr());
     return `${now.getFullYear() % 100}${
         now.getMonth() + 1
-    }${now.getDate()}${randStr}`;
+    }${now.getDate()}${randStr()}`;
 };
 
 const PaymentSchema = new Schema(
