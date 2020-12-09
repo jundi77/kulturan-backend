@@ -3,6 +3,7 @@ const Schema = mongoose.Schema;
 
 const generatePaymentId = () => {
     let now = new Date();
+    console.log('nanoid: ' + global.kulturan.models.Pembayaran.nanoid());
     return `${now.getFullYear() % 100}${
         now.getMonth() + 1
     }${now.getDate()}${global.kulturan.models.Pembayaran.nanoid()}`;
