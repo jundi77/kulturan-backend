@@ -28,7 +28,8 @@ global.kulturan.getClientIp = getClientIp;
 global.kulturan.log = {};
 global.kulturan.log.discord = require('./controllers/LogController');
 global.kulturan.models = {};
-global.kulturan.models.nanoid = require('./config/NanoIdConfig')(
+global.kulturan.models.Pembayaran = {};
+global.kulturan.models.Pembayaran.nanoid = require('./config/PaymentNanoIdConfig')(
     require('nanoid')
 );
 
