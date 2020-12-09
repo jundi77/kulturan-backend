@@ -323,35 +323,37 @@ function cancelPayment(req, res) {
                     status: 'success',
                 });
             } else if (response.status_code == 404) {
-                Pembayaran.findById(req.params.paymentid).then((struct) => {
-                    if (struct) {
-                        struct.paymentDetails.transactionStatus = 'cancel';
-                        let struct_obj = struct.paymentDetails;
-                        struct_obj.fraud_status = struct_obj.fraudStatus;
-                        struct_obj.gross_amount = struct.totalPrice;
-                        struct_obj.transaction_status =
-                            struct_obj.transactionStatus;
-                        struct_obj.order_id = struct._id;
-                        notifStatusPembayaranDiscord(struct.paymentDetails);
-                        struct.markModified('paymentDetails');
-                        struct.save((err, struct) => {
-                            if (err) {
-                                return res.status(500).json({
-                                    status: 'failed',
-                                    msg: 'DB ERROR',
+                Pembayaran.findById({ _id: req.params.paymentid }).then(
+                    (struct) => {
+                        if (struct) {
+                            struct.paymentDetails.transactionStatus = 'cancel';
+                            let struct_obj = struct.paymentDetails;
+                            struct_obj.fraud_status = struct_obj.fraudStatus;
+                            struct_obj.gross_amount = struct.totalPrice;
+                            struct_obj.transaction_status =
+                                struct_obj.transactionStatus;
+                            struct_obj.order_id = struct._id;
+                            notifStatusPembayaranDiscord(struct.paymentDetails);
+                            struct.markModified('paymentDetails');
+                            struct.save((err, struct) => {
+                                if (err) {
+                                    return res.status(500).json({
+                                        status: 'failed',
+                                        msg: 'DB ERROR',
+                                    });
+                                }
+                                return res.status(200).json({
+                                    status: 'success',
                                 });
-                            }
-                            return res.status(200).json({
-                                status: 'success',
                             });
-                        });
-                    } else {
-                        return res.status(404).json({
-                            status: 'failed',
-                            msg: 'Pembayaran tidak ditemukan',
-                        });
+                        } else {
+                            return res.status(404).json({
+                                status: 'failed',
+                                msg: 'Pembayaran tidak ditemukan',
+                            });
+                        }
                     }
-                });
+                );
             } else {
                 return res.status(400).json({
                     status: 'failed',
@@ -473,13 +475,7 @@ function getOneStruct(req, res) {
         req,
         `User \`${res.locals.user.data.email}\` meminta detail histori pembayaran dengan id \`${paymentID}\``
     );
-    if (!mongoose.Types.ObjectId.isValid(paymentID)) {
-        return res.status(404).json({
-            status: 'failed',
-            msg: 'Struct tidak ditemukan',
-        });
-    }
-    Pembayaran.findById(paymentID)
+    Pembayaran.findOne({ _id: paymentID })
         .select('totalPrice paid itemDetails paymentDetails createdAt')
         .populate({
             path: 'itemDetails',
