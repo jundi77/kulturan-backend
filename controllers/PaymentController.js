@@ -46,7 +46,7 @@ function makePembayaran(req, res, snapParameter, data, user, videoID = null) {
                         user.save();
                         global.kulturan.log.discord(
                             req,
-                            `User \`${user.email}\` melakukan pembelian baru dengan id \`${pembayaran._id}\``
+                            `User \`${req.locals.user.data.email}\` melakukan pembelian baru dengan id \`${pembayaran._id}\``
                         );
                         if (err) {
                             console.error(err);
