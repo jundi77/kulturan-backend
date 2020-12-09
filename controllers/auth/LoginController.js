@@ -53,7 +53,7 @@ const LoginController = (req, res) => {
                         }
                         global.kulturan.log.discord(
                             req,
-                            `User \`${newUser.email}\` login`
+                            `User \`${req.body.email}\` login`
                         );
                         res.status(200).json({
                             status: 'success',
