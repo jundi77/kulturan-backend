@@ -27,6 +27,10 @@ global.kulturan.googleapis = require('googleapis');
 global.kulturan.getClientIp = getClientIp;
 global.kulturan.log = {};
 global.kulturan.log.discord = require('./controllers/LogController');
+global.kulturan.models = {};
+global.kulturan.models.getPaymentId = require('./config/NanoIdConfig')(
+    require('nanoid')
+);
 
 /**
  * app.use apaan?
